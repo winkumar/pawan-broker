@@ -22,6 +22,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<jjwt.version>0.6.0</jjwt.version>
+		<hikari.version>2.4.7</hikari.version>
+		<lombok.version>1.16.6</lombok.version>
+		<swagger.version>2.2.2</swagger.version>
+		
 	</properties>
 
 	<dependencies>
@@ -49,10 +54,55 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.springframework.mobile</groupId>
+            <artifactId>spring-mobile-device</artifactId>
+        </dependency>
+				
+		<dependency>
+      		<groupId>io.jsonwebtoken</groupId>
+      		<artifactId>jjwt</artifactId>
+      		<version>${jjwt.version}</version>
+    	</dependency>
+		
+		 <!-- swagger dependency -->
+           
+		<dependency>
+   			<groupId>io.springfox</groupId>
+   			<artifactId>springfox-swagger2</artifactId>
+   			<version>${swagger.version}</version>
+   		</dependency>
+   		<dependency>
+   			<groupId>io.springfox</groupId>
+   			<artifactId>springfox-swagger-ui</artifactId>
+   			<version>${swagger.version}</version>
+   		</dependency>
+		
+		
+		<!-- HikariCP for connection pooling -->
+		
+		<dependency>
+    		<groupId>com.zaxxer</groupId>
+    		<artifactId>HikariCP</artifactId>
+    		<version>${hikari.version}</version> <!-- $NO-MVN-MAN-VER$ -->
+    		<scope>compile</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
 		</dependency>
 	</dependencies>
 

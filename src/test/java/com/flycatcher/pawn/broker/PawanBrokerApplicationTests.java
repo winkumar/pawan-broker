@@ -1,4 +1,4 @@
-package com.flycatcher.pawan.broker;
+package com.flycatcher.pawn.broker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

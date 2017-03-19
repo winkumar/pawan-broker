@@ -1,4 +1,4 @@
-package com.flycatcher.pawan.broker;
+package com.flycatcher.pawn.broker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
