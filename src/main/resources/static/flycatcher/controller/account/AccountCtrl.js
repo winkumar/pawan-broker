@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 (function () {
     angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location) {
         var compdata = [];
