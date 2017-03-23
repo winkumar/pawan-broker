@@ -3,8 +3,9 @@
 angular.module('myApp.account',[]);
 angular.module('myApp.login',[]);
 angular.module('myApp.dayBook',[]);
+angular.module('myApp.journal',[]);
 
-var myApp = angular.module('myApp',['myApp.account','myApp.login','myApp.dayBook']);
+var myApp = angular.module('myApp',['myApp.account','myApp.login','myApp.dayBook','myApp.journal']);
 myApp.config(function($routeProvider, $locationProvider) {
   $routeProvider
   	.when('/', {templateUrl: '/flycatcher/screen/login/login.html'})

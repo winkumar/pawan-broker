@@ -75,6 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.jpg",
                         "/**/*.ttf",
                         "/**/*.woff",
+                        "/**/*.json",
                         "/api-docs",
                         "/v2/api-docs",
                         "/webjars.*",

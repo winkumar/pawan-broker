@@ -10,7 +10,8 @@
 					'type':'',
 					'description':''
 				};
-				var dayBookList = [];
-				dayBookList.push($scope.daybook)
+				var dayBooData = [];
+				dayBooData.push($scope.daybook);
+				$scope.dayBookList = dayBooData;
 			});
 }());
