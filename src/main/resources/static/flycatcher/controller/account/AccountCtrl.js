@@ -9,7 +9,7 @@
         //       }
         //     });   
         $scope.account = {
-            "accountdate": "",
+            "date": "",
             "accountNo": "AC101",
             "name": "tomato",
             "fathername": "ffdfs",

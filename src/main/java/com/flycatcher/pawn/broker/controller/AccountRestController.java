@@ -1,6 +1,10 @@
 package com.flycatcher.pawn.broker.controller;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -29,9 +33,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flycatcher.pawn.broker.UrlPath;
+import com.flycatcher.pawn.broker.exception.DataFormatException;
 import com.flycatcher.pawn.broker.exception.ResourceAlreadyExistException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.pojo.AccountInfo;
+import com.flycatcher.pawn.broker.pojo.AccountPageInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
 
 
@@ -51,7 +58,7 @@ public class AccountRestController extends AbstractRestHandler {
 	
 	@Autowired
 	public AccountRestController(final AccountService accountService){
-		LOGGER.info("--------- AccountRestController Invoked ----------------");
+		LOGGER.info("--- AccountRestController Invoked ---");
 		
 		this.accountService=accountService;
 								
@@ -81,9 +88,55 @@ public class AccountRestController extends AbstractRestHandler {
 		
 		final Pageable pageable = new PageRequest(page, size, new Sort(sort,"accountNumber","firstName","lastName","area"));
 	    			
-		final Page<Account> clDatabasePage=this.accountService.getPageOfAccount(search,pageable);
+		final Page<Account> accountPage=this.accountService.getPageOfAccount(search,pageable);
+		
+		List<Account> accounts=accountPage.getContent();
+		
+		List<AccountInfo> accountInfos=new ArrayList<AccountInfo>();
+		accounts.forEach(account ->{
+			AccountInfo accountInfo=new AccountInfo();
+			
+			accountInfo.setAccountId(account.getAccountId());
+			accountInfo.setAccountNumber(account.getAccountNumber());
+			accountInfo.setArea(account.getArea());
+			accountInfo.setCity(account.getCity());
+			accountInfo.setCreatedBy(account.getCreatedBy()!=null?account.getCreatedBy().getFirstName()+" "+account.getCreatedBy().getFirstName():null);
+			accountInfo.setCreatedDate(account.getCreatedDate());
+			accountInfo.setCurrentAddress(account.getCurrentAddress());
+			accountInfo.setFatherName(account.getFatherName());
+			accountInfo.setLastName(account.getLastName());
+			accountInfo.setFirstName(account.getFirstName());
+			accountInfo.setLastName(account.getLastName());
+			accountInfo.setModifiedBy(account.getModifiedBy()!=null?account.getModifiedBy().getFirstName()+" "+account.getModifiedBy().getLastName():null);
+			accountInfo.setPinCode(account.getPinCode());
+			accountInfo.setPresentAddress(account.getPresentAddress());
+			accountInfo.setState(account.getState());
+			
+			
+			accountInfos.add(accountInfo);
+		});
+		
+		long totalPages=accountPage.getTotalPages();
+		long pageNumber=accountPage.getNumber();
+		long numberOfElements=accountPage.getNumberOfElements();
+		long size1=accountPage.getSize();
+		long totalElements=accountPage.getTotalElements();
+			
+		Map<String,Long> pagePropertys = new ConcurrentHashMap<>();
+			
+		pagePropertys.put("totalPages",totalPages);
+		pagePropertys.put("pageNumber",pageNumber);
+		pagePropertys.put("numberOfElements",numberOfElements);
+		pagePropertys.put("size",size1);
+		pagePropertys.put("totalElements",totalElements);
+						
+		AccountPageInfo accountPageInfo=new AccountPageInfo();
+		accountPageInfo.setPagePropertys(pagePropertys);
+		accountPageInfo.setAccountInfos(accountInfos);	
+			 
+
 		LOGGER.info("--- account page return successfully ---");
-		return new ResponseEntity<>(clDatabasePage,HttpStatus.OK);
+		return new ResponseEntity<>(accountPageInfo,HttpStatus.OK);
 	}
 	
 	/*
@@ -105,9 +158,33 @@ public class AccountRestController extends AbstractRestHandler {
 		
 		Sort sort=new Sort(sortDirection,"accountNumber","firstName","lastName","area");
 		List<Account> accounts=this.accountService.getAllAccount(sort);
+		List<AccountInfo> accountInfos=new ArrayList<AccountInfo>();
+		accounts.forEach(account ->{
+			AccountInfo accountInfo=new AccountInfo();
+			
+			accountInfo.setAccountId(account.getAccountId());
+			accountInfo.setAccountNumber(account.getAccountNumber());
+			accountInfo.setArea(account.getArea());
+			accountInfo.setCity(account.getCity());
+			accountInfo.setCreatedBy(account.getCreatedBy()!=null?account.getCreatedBy().getFirstName()+" "+account.getCreatedBy().getFirstName():null);
+			accountInfo.setCreatedDate(account.getCreatedDate());
+			accountInfo.setCurrentAddress(account.getCurrentAddress());
+			accountInfo.setFatherName(account.getFatherName());
+			accountInfo.setLastName(account.getLastName());
+			accountInfo.setFirstName(account.getFirstName());
+			accountInfo.setLastName(account.getLastName());
+			accountInfo.setModifiedBy(account.getModifiedBy()!=null?account.getModifiedBy().getFirstName()+" "+account.getModifiedBy().getLastName():null);
+			accountInfo.setPinCode(account.getPinCode());
+			accountInfo.setPresentAddress(account.getPresentAddress());
+			accountInfo.setState(account.getState());
+			
+			
+			accountInfos.add(accountInfo);
+		});
+		
 		
 		LOGGER.info("--- account list return successfully ---");
-		return new ResponseEntity<>(accounts,HttpStatus.OK);
+		return new ResponseEntity<>(accountInfos,HttpStatus.OK);
 	}
 	
 	
@@ -132,7 +209,26 @@ public class AccountRestController extends AbstractRestHandler {
 			throw new ResourceNotFoundException("account does not exist's ...!");
 		}
 		
-		return new ResponseEntity<>(account,HttpStatus.OK);
+		AccountInfo accountInfo=new AccountInfo();
+		
+		accountInfo.setAccountId(account.getAccountId());
+		accountInfo.setAccountNumber(account.getAccountNumber());
+		accountInfo.setArea(account.getArea());
+		accountInfo.setCity(account.getCity());
+		accountInfo.setCreatedBy(account.getCreatedBy()!=null?account.getCreatedBy().getFirstName()+" "+account.getCreatedBy().getFirstName():null);
+		accountInfo.setCreatedDate(account.getCreatedDate());
+		accountInfo.setCurrentAddress(account.getCurrentAddress());
+		accountInfo.setFatherName(account.getFatherName());
+		accountInfo.setLastName(account.getLastName());
+		accountInfo.setFirstName(account.getFirstName());
+		accountInfo.setLastName(account.getLastName());
+		accountInfo.setModifiedBy(account.getModifiedBy()!=null?account.getModifiedBy().getFirstName()+" "+account.getModifiedBy().getLastName():null);
+		accountInfo.setPinCode(account.getPinCode());
+		accountInfo.setPresentAddress(account.getPresentAddress());
+		accountInfo.setState(account.getState());
+		
+		
+		return new ResponseEntity<>(accountInfo,HttpStatus.OK);
 	}
 	
 	
@@ -148,70 +244,59 @@ public class AccountRestController extends AbstractRestHandler {
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
     public    @ResponseBody
     ResponseEntity<?> createDatabase(@ApiParam(value = "The account object", required = true)
-									@RequestBody Account account,
+									@RequestBody AccountInfo accountInfo,
 									HttpServletRequest request, HttpServletResponse response) {
-		LOGGER.info("--- create account rest controller invoked , account -> {} ---",account);
+		LOGGER.info("--- create account rest controller invoked , account -> {} ---",accountInfo);
 		
-		/*if(account.==null || databaseInfo.getDatabaseName().trim().length()<=0){
-			LOGGER.info("--- database name does not exist's ---");
-			throw new ResourceNotFoundException("database name does not exist's ...!");
+		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty() || accountInfo.getLastName()==null || accountInfo.getLastName().isEmpty())
+		{
+			LOGGER.info("--- first name or last name is empty or null ---");
+			throw new DataFormatException("first name (or) last name is doesn't exist's ...!");
 		}
 		
-		final List<ClDatabase> clDatabases=this.clDatabaseService.getAllClDatabaseByName(databaseInfo.getDatabaseName());
-		if(clDatabases.size()>0){
-			LOGGER.info("--- database name already exist's ----");
-			throw new ResourceAlreadyExistException("database name already exist's ...!");
+		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
+			LOGGER.info("--- father name is empty or null ---");
+			throw new DataFormatException("father name doesn't exist's ...!");
 		}
 		
-		if(databaseInfo.getUsername()==null || databaseInfo.getUsername().trim().length()<=0){
-			LOGGER.info("--- database username name does not exist's ---");
-			throw new ResourceNotFoundException("database username name does not exist's ...!");
+		if(accountInfo.getPinCode()==null || accountInfo.getPinCode().isEmpty()){
+			LOGGER.info("--- pincode is empty or null ---");
+			throw new DataFormatException("pincode doesn't exist's ...!");
 		}
 		
-		if(databaseInfo.getPassword()==null || databaseInfo.getPassword().trim().length()<=0){
-			LOGGER.info("--- database password does not exist's ---");
-			throw new ResourceNotFoundException("database password does not exist's ...!");
+		if(accountInfo.getState()==null || accountInfo.getState().isEmpty()){
+			LOGGER.info("---  state is empty or null ---");
+			throw new DataFormatException("state doesn't exist's ...!");
 		}
 		
-		if(databaseInfo.getMinPoolSize()==null){
-			LOGGER.info("--- database min pool size is null  ---");
-			databaseInfo.setMinPoolSize(2);
-		}
 		
-		if(databaseInfo.getMaxPoolSize()==null){
-			LOGGER.info("--- database max pool size is null  ---");
-			databaseInfo.setMaxPoolSize(4);
+		Account account=new Account();
+				
+		account.setFirstName(accountInfo.getFirstName());
+		account.setLastName(accountInfo.getLastName());
+		account.setFatherName(accountInfo.getFatherName());
+		account.setCurrentAddress(accountInfo.getCurrentAddress());
+		account.setPinCode(accountInfo.getPinCode());
+		account.setArea(accountInfo.getArea());
+		account.setCity(account.getCity());
+		account.setState(accountInfo.getState());
+		account.setCreatedDate(new Date());
+		account.setModifiedDate(new Date());
+	
+		Account createdAccount=this.accountService.createOrUpdateAccount(account);		
+		if(createdAccount!=null){
+			createdAccount.setAccountNumber("ACC"+createdAccount.getAccountId());
+			Account updateAccount=this.accountService.createOrUpdateAccount(createdAccount);
+			LOGGER.debug("--- created account object -> {}  ---",updateAccount);
 		}
 				
-		if(databaseInfo.getClDatabaseServerId()==null){
-			LOGGER.info("--- database server id does not exist's ---");
-			throw new ResourceNotFoundException("database server does not exist's ...!");
-		}
-		
-		final ClDatabaseServer clDatabaseServer=this.clDatabaseServerService.getClDatabaseServerById(databaseInfo.getClDatabaseServerId());
-		if(clDatabaseServer==null){
-			LOGGER.info("--- database server does not exist's , this id --> {} ---",databaseInfo.getClDatabaseServerId());
-			throw new ResourceNotFoundException("database server does not exist's ...!");
-		}
-		
-		final ClDatabase clDatabase=new ClDatabase();
-		clDatabase.setDatabaseName(databaseInfo.getDatabaseName());
-		clDatabase.setMinPoolSize(databaseInfo.getMinPoolSize());
-		clDatabase.setMaxPoolSize(databaseInfo.getMaxPoolSize());
-		clDatabase.setUsername(databaseInfo.getUsername());
-		clDatabase.setPassword(databaseInfo.getPassword());
-		clDatabase.setClDatabaseServer(clDatabaseServer);
-		
-		final ClDatabase createdClDatabase=this.clDatabaseService.createNewClDatabase(clDatabase);
-		
-		LOGGER.info("created database  object --> {} --",createdClDatabase);
-		
-		response.setHeader("Location", request.getRequestURL().append("/").append(createdClDatabase.getDatabaseId()).toString());
-*/				
-		return new ResponseEntity<>(account,HttpStatus.CREATED);
+		LOGGER.info("--- account created successfully ---");
+		return new ResponseEntity<>(HttpStatus.CREATED);
 		
 		
 	}
+	
+	
 	
 	
 	/*
@@ -228,9 +313,9 @@ public class AccountRestController extends AbstractRestHandler {
     ResponseEntity<?> updateDatabase(@ApiParam(value = "The account Id", required = true)
 										@PathVariable("accountId") final Long accountId,
 										@ApiParam(value = "The database Object", required = true)
-										@RequestBody final Account account,
+										@RequestBody final AccountInfo accountInfo,
 										HttpServletRequest request, HttpServletResponse response) {
-		LOGGER.info("--- update account rest controller invoked , accountId -> {} , account -> {} ---",accountId,account);
+		LOGGER.info("--- update account rest controller invoked , accountId -> {} , account -> {} ---",accountId,accountInfo);
 		
 		Account accountObject=this.accountService.getAccountById(accountId);
 		if(accountObject==null){

@@ -1,10 +1,20 @@
 package com.flycatcher.pawn.broker.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 import java.util.Set;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * The persistent class for the account database table.
@@ -12,13 +22,20 @@ import java.util.Set;
  */
 @Entity
 @Table(name="account")
-@NamedQuery(name="Account.findAll", query="SELECT a FROM Account a")
+@EqualsAndHashCode
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Account implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@SequenceGenerator(name="ACCOUNT_ID_GENERATOR" )
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ACCOUNT_ID_GENERATOR")
 	@Column(name="account_id")
-	private String accountId;
+	private Long accountId;
 
 	@Column(name="account_number")
 	private String accountNumber;
@@ -56,162 +73,22 @@ public class Account implements Serializable {
 	private String state;
 
 	//bi-directional many-to-one association to UserInfo
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="created_by")
-	private UserInfo userInfo1;
+	@JsonIgnore
+	private UserInfo createdBy;
 
 	//bi-directional many-to-one association to UserInfo
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="modified_by")
-	private UserInfo userInfo2;
+	@JsonIgnore
+	private UserInfo modifiedBy;
 
 	//bi-directional many-to-one association to DayBook
-	@OneToMany(mappedBy="account")
+	@OneToMany(mappedBy="account",fetch=FetchType.LAZY)
+	@JsonIgnore
 	private Set<DayBook> dayBooks;
 
-	public Account() {
-	}
 
-	public String getAccountId() {
-		return this.accountId;
-	}
-
-	public void setAccountId(String accountId) {
-		this.accountId = accountId;
-	}
-
-	public String getAccountNumber() {
-		return this.accountNumber;
-	}
-
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
-	}
-
-	public String getArea() {
-		return this.area;
-	}
-
-	public void setArea(String area) {
-		this.area = area;
-	}
-
-	public String getCity() {
-		return this.city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public Date getCreatedDate() {
-		return this.createdDate;
-	}
-
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public String getCurrentAddress() {
-		return this.currentAddress;
-	}
-
-	public void setCurrentAddress(String currentAddress) {
-		this.currentAddress = currentAddress;
-	}
-
-	public String getFatherName() {
-		return this.fatherName;
-	}
-
-	public void setFatherName(String fatherName) {
-		this.fatherName = fatherName;
-	}
-
-	public String getFirstName() {
-		return this.firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return this.lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public Date getModifiedDate() {
-		return this.modifiedDate;
-	}
-
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
-
-	public String getPinCode() {
-		return this.pinCode;
-	}
-
-	public void setPinCode(String pinCode) {
-		this.pinCode = pinCode;
-	}
-
-	public String getPresentAddress() {
-		return this.presentAddress;
-	}
-
-	public void setPresentAddress(String presentAddress) {
-		this.presentAddress = presentAddress;
-	}
-
-	public String getState() {
-		return this.state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public UserInfo getUserInfo1() {
-		return this.userInfo1;
-	}
-
-	public void setUserInfo1(UserInfo userInfo1) {
-		this.userInfo1 = userInfo1;
-	}
-
-	public UserInfo getUserInfo2() {
-		return this.userInfo2;
-	}
-
-	public void setUserInfo2(UserInfo userInfo2) {
-		this.userInfo2 = userInfo2;
-	}
-
-	public Set<DayBook> getDayBooks() {
-		return this.dayBooks;
-	}
-
-	public void setDayBooks(Set<DayBook> dayBooks) {
-		this.dayBooks = dayBooks;
-	}
-
-	public DayBook addDayBook(DayBook dayBook) {
-		getDayBooks().add(dayBook);
-		dayBook.setAccount(this);
-
-		return dayBook;
-	}
-
-	public DayBook removeDayBook(DayBook dayBook) {
-		getDayBooks().remove(dayBook);
-		dayBook.setAccount(null);
-
-		return dayBook;
-	}
 
 }

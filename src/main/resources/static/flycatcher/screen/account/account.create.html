@@ -5,87 +5,78 @@
 			<div class="col-sm-5">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Create Account</h3>
+						<h3 class="panel-title">Account</h3>
 					</div>
 					<div class="panel-body">
-						<form 
-						class="form-horizontal fv-form fv-form-bootstrap"
-						id="myform"
-						name="myform"
-						novalidate>
+						<form class="form-horizontal fv-form fv-form-bootstrap"
+							id="myform">
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Date</label>
 								<div class="col-sm-8">
-									<input type="date" class="form-control" name="datePicker"
-										ng-model="account.accountdate" id="datePicker" required/>
+									<input type="date" class="form-control" ng-model="account.date"
+										id="date" />
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Name</label>
 								<div class="col-sm-8">
 									<input type="text" class="form-control" ng-model="account.name"
-										id="accountName" name="accountName" required>
+										id="name">
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Fathers Name</label>
 								<div class="col-sm-8">
 									<input type="text" class="form-control"
-										ng-model="account.fathername" id="fatherName" required>
+										ng-model="account.fathername" id="fathername">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-6 label_left">Door No / Street</label> <label
-									class="col-sm-6 label_left">Area</label>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-6">
+								<label class="col-sm-4 label_right">Door No / Street</label>
+								<div class="col-sm-8 label_right">
 									<input type="text" class="form-control"
-										ng-model="account.address" id="doorNo" required>
+										ng-model="account.address" id="address">
 								</div>
-								<div class="col-sm-6">
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 label_right">Area</label>
+								<div class="col-sm-8 label_right">
 									<input type="text" class="form-control" ng-model="account.area"
-										id="area" required>
+										id="area">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-6 label_left">City</label> <label
-									class="col-sm-6 label_left">State</label>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-6">
+								<label class="col-sm-4 label_right">City</label>
+								<div class="col-sm-8">
 									<input type="text" class="form-control" ng-model="account.city"
-										id="city" >
+										id="city">
 								</div>
-								<div class="col-sm-6">
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 label_right">State</label>
+								<div class="col-sm-8">
 									<input type="text" class="form-control"
-										ng-model="account.state" id="state" required>
+										ng-model="account.state" id="state">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-6 label_left">Pincode</label>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-6">
+								<label class="col-sm-4 label_right">Pincode</label>
+								<div class="col-sm-8 label_right">
 									<input type="text" class="form-control"
-										ng-model="account.pincode" id="pincode" required>
+										ng-model="account.pincode" id="pincode">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-10 label_left">Remarks</label>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-10">
+								<label class="col-sm-4 label_right">Remarks</label>
+								<div class="col-sm-8">
 									<textarea class="form-control" id="inputEmail3"
-										ng-model="account.remarks" rows="5" cols="20" id="remarks"></textarea>
+										ng-model="account.remarks" rows="5" cols="20"></textarea>
 								</div>
 							</div>
 							<div class="form-group ">
 								<span class="col-sm-10"></span>
-								<button type="button" 
-								class="btn btn-primary"
-								ng-click="addAccount(account)"
-								ng-disabled="myform.$invalid">Save</button>
+								<button type="button" class="btn btn-primary"
+									ng-click="addAccount(account)">Save</button>
 							</div>
 						</form>
 					</div>
@@ -94,7 +85,7 @@
 			<div class="col-sm-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Panel title</h3>
+						<h3 class="panel-title">Account Total Records</h3>
 					</div>
 					<div class="panel-body">
 						<form>
@@ -154,5 +145,4 @@
 			</div>
 		</div>
 	</div>
-</div>
 </div>

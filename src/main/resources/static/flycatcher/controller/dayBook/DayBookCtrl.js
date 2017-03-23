@@ -2,7 +2,7 @@
 (function() {
 	angular.module('myApp.account').controller('DayBookCtrl',
 			function($scope, $http, $attrs, $location) {
-				$scope.journal = {
+				$scope.daybook = {
 					'date':'',
 					'account':'',
 					'amount':'',
@@ -10,5 +10,7 @@
 					'type':'',
 					'description':''
 				};
+				var dayBookList = [];
+				dayBookList.push($scope.daybook)
 			});
 }());

@@ -1,8 +1,18 @@
 package com.flycatcher.pawn.broker.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Set;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 
 /**
@@ -11,7 +21,12 @@ import java.util.Set;
  */
 @Entity
 @Table(name="role")
-@NamedQuery(name="Role.findAll", query="SELECT r FROM Role r")
+@EqualsAndHashCode
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Role implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -38,39 +53,5 @@ public class Role implements Serializable {
 		)
 	private Set<UserInfo> userInfos;
 
-	public Role() {
-	}
-
-	public Long getRoleId() {
-		return this.roleId;
-	}
-
-	public void setRoleId(Long roleId) {
-		this.roleId = roleId;
-	}
-
-	public String getRoleDesc() {
-		return this.roleDesc;
-	}
-
-	public void setRoleDesc(String roleDesc) {
-		this.roleDesc = roleDesc;
-	}
-
-	public String getRoleName() {
-		return this.roleName;
-	}
-
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
-
-	public Set<UserInfo> getUserInfos() {
-		return this.userInfos;
-	}
-
-	public void setUserInfos(Set<UserInfo> userInfos) {
-		this.userInfos = userInfos;
-	}
 
 }
