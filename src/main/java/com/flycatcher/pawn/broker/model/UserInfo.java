@@ -23,18 +23,17 @@ import lombok.ToString;
  */
 @Entity
 @Table(name="user_info")
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude={"createdAccounts","modifiedAccounts","createdDayBooks","modifiedDayBooks","roles"})
 @Getter
 @Setter
-@ToString
+@ToString(exclude={"createdAccounts","modifiedAccounts","createdDayBooks","modifiedDayBooks","roles"})
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="USER_INFO_USERID_GENERATOR" )
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="USER_INFO_USERID_GENERATOR")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="user_id")
 	private Long userId;
 

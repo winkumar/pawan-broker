@@ -26,5 +26,6 @@ public interface UserInfoService {
 	 UserInfo updateUserInfo(UserInfo userInfo);
 	 Page<UserInfo> getPageOfUserInfo(String search,Pageable pageable);
 	 void deleteUserInfoById(long userInfoId);
+	 String getUserNameForAthentication();
 
 }

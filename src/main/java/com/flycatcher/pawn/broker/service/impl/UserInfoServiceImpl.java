@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -126,6 +128,15 @@ private static final Logger LOGGER = LoggerFactory.getLogger(UserInfoServiceImpl
         	LOGGER.info("--- user found ---> {} ---",userInfo);
             return JwtUserFactory.create(userInfo);
         }
+	}
+
+	@Override
+	public String getUserNameForAthentication() {
+		LOGGER.debug("--- get username from authentication ---");
+		Authentication auth =SecurityContextHolder.getContext().getAuthentication();
+        if(auth!=null)
+        	return auth.getName();
+        return null;
 	}
 
 }

@@ -37,9 +37,11 @@ import com.flycatcher.pawn.broker.exception.DataFormatException;
 import com.flycatcher.pawn.broker.exception.ResourceAlreadyExistException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.UserInfo;
 import com.flycatcher.pawn.broker.pojo.AccountInfo;
 import com.flycatcher.pawn.broker.pojo.AccountPageInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
+import com.flycatcher.pawn.broker.service.UserInfoService;
 
 
 
@@ -55,12 +57,14 @@ public class AccountRestController extends AbstractRestHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountRestController.class);
 	
 	private final AccountService accountService;
+	private final UserInfoService userInfoService;
 	
 	@Autowired
-	public AccountRestController(final AccountService accountService){
+	public AccountRestController(final AccountService accountService,final UserInfoService userInfoService){
 		LOGGER.info("--- AccountRestController Invoked ---");
 		
 		this.accountService=accountService;
+		this.userInfoService=userInfoService;
 								
 	}
 	
@@ -73,8 +77,9 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get Page current account.", notes = "It will provide page of account.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
-    ResponseEntity<?> getPageOfDatabase(
+    ResponseEntity<?> getPageOfAccount(
     		@ApiParam(value = "The page number (zero-based)", required = true)
 			@RequestParam(value = "page", required = true, defaultValue = DEFAULT_PAGE_NUM) Integer page,
 			@ApiParam(value = "The page size", required = true)
@@ -150,10 +155,11 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get all account.", notes = "It will provide of list of accounts.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
-    ResponseEntity<?> getAllDatabase(@ApiParam(value = "The account  sort by account number, first name,last name,last name,area", required = true)
+    ResponseEntity<?> getAllAccount(@ApiParam(value = "The account  sort by account number, first name,last name,last name,area", required = true)
     								@RequestParam(value = "sort", required = true, defaultValue = DEFAULT_PAGE_SORT) Sort.Direction sortDirection ,
-										HttpServletRequest request, HttpServletResponse response) {
+									HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- get all account rest controller invoked , sort -> {} ---",sortDirection);
 		
 		Sort sort=new Sort(sortDirection,"accountNumber","firstName","lastName","area");
@@ -197,8 +203,9 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get acccount by Id.", notes = "It will provide of account.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
-    ResponseEntity<?> getDatabaseById(@ApiParam(value = "The account by Id", required = true)
+    ResponseEntity<?> getAccountById(@ApiParam(value = "The account by Id", required = true)
 										@PathVariable("accountId") Long accountId,
 										HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- get account by Id rest controller invoked , accountId -> {} ---",accountId);
@@ -215,7 +222,7 @@ public class AccountRestController extends AbstractRestHandler {
 		accountInfo.setAccountNumber(account.getAccountNumber());
 		accountInfo.setArea(account.getArea());
 		accountInfo.setCity(account.getCity());
-		accountInfo.setCreatedBy(account.getCreatedBy()!=null?account.getCreatedBy().getFirstName()+" "+account.getCreatedBy().getFirstName():null);
+		accountInfo.setCreatedBy(account.getCreatedBy()!=null?account.getCreatedBy().getFirstName()+" "+account.getCreatedBy().getLastName():null);
 		accountInfo.setCreatedDate(account.getCreatedDate());
 		accountInfo.setCurrentAddress(account.getCurrentAddress());
 		accountInfo.setFatherName(account.getFatherName());
@@ -227,7 +234,7 @@ public class AccountRestController extends AbstractRestHandler {
 		accountInfo.setPresentAddress(account.getPresentAddress());
 		accountInfo.setState(account.getState());
 		
-		
+		LOGGER.info("--- ---");
 		return new ResponseEntity<>(accountInfo,HttpStatus.OK);
 	}
 	
@@ -242,8 +249,9 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Create new account .", notes = "provide valid  account Object.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
-    ResponseEntity<?> createDatabase(@ApiParam(value = "The account object", required = true)
+    ResponseEntity<?> createDatabase(@ApiParam(value = "The account info object", required = true)
 									@RequestBody AccountInfo accountInfo,
 									HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- create account rest controller invoked , account -> {} ---",accountInfo);
@@ -269,6 +277,8 @@ public class AccountRestController extends AbstractRestHandler {
 			throw new DataFormatException("state doesn't exist's ...!");
 		}
 		
+		String userName=this.userInfoService.getUserNameForAthentication();
+		UserInfo createdBy=this.userInfoService.getUserInfoUserName(userName);
 		
 		Account account=new Account();
 				
@@ -281,8 +291,10 @@ public class AccountRestController extends AbstractRestHandler {
 		account.setCity(account.getCity());
 		account.setState(accountInfo.getState());
 		account.setCreatedDate(new Date());
+		account.setCreatedBy(createdBy);
 		account.setModifiedDate(new Date());
-	
+		account.setModifiedBy(createdBy);
+		
 		Account createdAccount=this.accountService.createOrUpdateAccount(account);		
 		if(createdAccount!=null){
 			createdAccount.setAccountNumber("ACC"+createdAccount.getAccountId());
@@ -309,6 +321,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Update new account .", notes = "provide valid  account Object.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> updateDatabase(@ApiParam(value = "The account Id", required = true)
 										@PathVariable("accountId") final Long accountId,
@@ -317,15 +330,52 @@ public class AccountRestController extends AbstractRestHandler {
 										HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- update account rest controller invoked , accountId -> {} , account -> {} ---",accountId,accountInfo);
 		
-		Account accountObject=this.accountService.getAccountById(accountId);
-		if(accountObject==null){
+		Account account=this.accountService.getAccountById(accountId);
+		if(account==null){
 			LOGGER.info("--- account does not exist's ---");
 			throw new ResourceNotFoundException("account does not exist's ...!");
 		}
 		
+		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty() || accountInfo.getLastName()==null || accountInfo.getLastName().isEmpty())
+		{
+			LOGGER.info("--- first name or last name is empty or null ---");
+			throw new DataFormatException("first name (or) last name is doesn't exist's ...!");
+		}
 		
+		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
+			LOGGER.info("--- father name is empty or null ---");
+			throw new DataFormatException("father name doesn't exist's ...!");
+		}
 		
-				
+		if(accountInfo.getPinCode()==null || accountInfo.getPinCode().isEmpty()){
+			LOGGER.info("--- pincode is empty or null ---");
+			throw new DataFormatException("pincode doesn't exist's ...!");
+		}
+		
+		if(accountInfo.getState()==null || accountInfo.getState().isEmpty()){
+			LOGGER.info("---  state is empty or null ---");
+			throw new DataFormatException("state doesn't exist's ...!");
+		}
+		
+		String userName=this.userInfoService.getUserNameForAthentication();
+		UserInfo modifiedBy=this.userInfoService.getUserInfoUserName(userName);
+								
+		account.setFirstName(accountInfo.getFirstName());
+		account.setLastName(accountInfo.getLastName());
+		account.setFatherName(accountInfo.getFatherName());
+		account.setCurrentAddress(accountInfo.getCurrentAddress());
+		account.setPinCode(accountInfo.getPinCode());
+		account.setArea(accountInfo.getArea());
+		account.setCity(account.getCity());
+		account.setState(accountInfo.getState());
+		//account.setCreatedDate(new Date());
+		//account.setCreatedBy(createdBy);
+		account.setModifiedDate(new Date());
+		account.setModifiedBy(modifiedBy);
+		
+		Account updatedAccount=this.accountService.createOrUpdateAccount(account);
+		LOGGER.debug("--- updated account -> {} ---",updatedAccount);
+		LOGGER.info("--- account updated sucessfully ---");		
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		
 		
@@ -340,6 +390,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Delete account by Id.", notes = "provide valid account id.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	//@PreAuthorize("hasAnyRole('ADMIN')")
     public    @ResponseBody
     ResponseEntity<?> deleteDatabaseById(@ApiParam(value = "The account by Id", required = true)
 										@PathVariable("accountId") final Long accountId,

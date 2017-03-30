@@ -25,7 +25,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             +" LOWER(a.area) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(a.city) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(a.fatherName) LIKE LOWER(CONCAT('%',?1, '%')))" )
-	public Page<Account> findAccountByPage(String search,Pageable pageable);
+	Page<Account> findAccountByPage(String search,Pageable pageable);
 }
 
 

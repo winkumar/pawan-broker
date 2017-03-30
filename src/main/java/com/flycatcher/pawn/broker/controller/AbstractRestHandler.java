@@ -242,6 +242,9 @@ public abstract class AbstractRestHandler{
       if(ex instanceof ExpiredJwtException){
     	  
     	  return new RestErrorInfo("refresh token expired", "Full authentication need to access this resource");
+      }else if(ex instanceof org.springframework.security.access.AccessDeniedException){
+    	  response.setStatus(401);
+    	  return new RestErrorInfo("Access denied ...!", "Full authentication need to access this resource");
       }
         
         return new RestErrorInfo("Somthing went wrong","It is not valid request");

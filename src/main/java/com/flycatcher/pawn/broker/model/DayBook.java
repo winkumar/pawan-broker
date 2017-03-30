@@ -33,8 +33,7 @@ public class DayBook implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="DAY_BOOK_ID_GENERATOR" )
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="DAY_BOOK_ID_GENERATOR")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="day_book_id")
 	private Long dayBookId;
 
@@ -53,8 +52,13 @@ public class DayBook implements Serializable {
 	private String transactionDesc;
 
 	@Column(name="transaction_type")
-	private String transactionType;
+    @Enumerated(EnumType.STRING)
+	private TransactionType transactionType;
 
+	@Temporal(TemporalType.DATE)
+	@Column(name="transaction_date")
+	private Date transactionDate;
+	
 	//bi-directional many-to-one association to UserInfo
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="created_by")
@@ -74,3 +78,4 @@ public class DayBook implements Serializable {
 	private Account account;
 
 }
+
