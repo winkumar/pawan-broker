@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,10 +38,13 @@ import com.flycatcher.pawn.broker.exception.DataFormatException;
 import com.flycatcher.pawn.broker.exception.ResourceAlreadyExistException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.model.UserInfo;
 import com.flycatcher.pawn.broker.pojo.AccountInfo;
 import com.flycatcher.pawn.broker.pojo.AccountPageInfo;
+import com.flycatcher.pawn.broker.pojo.DayBookInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
+import com.flycatcher.pawn.broker.service.DayBookService;
 import com.flycatcher.pawn.broker.service.UserInfoService;
 
 
@@ -57,14 +61,17 @@ public class AccountRestController extends AbstractRestHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountRestController.class);
 	
 	private final AccountService accountService;
+	private final DayBookService dayBookService;
 	private final UserInfoService userInfoService;
 	
 	@Autowired
-	public AccountRestController(final AccountService accountService,final UserInfoService userInfoService){
+	public AccountRestController(final AccountService accountService,final UserInfoService userInfoService,
+								final DayBookService dayBookService){
 		LOGGER.info("--- AccountRestController Invoked ---");
 		
 		this.accountService=accountService;
 		this.userInfoService=userInfoService;
+		this.dayBookService=dayBookService;
 								
 	}
 	
@@ -77,7 +84,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get Page current account.", notes = "It will provide page of account.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> getPageOfAccount(
     		@ApiParam(value = "The page number (zero-based)", required = true)
@@ -155,7 +162,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get all account.", notes = "It will provide of list of accounts.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> getAllAccount(@ApiParam(value = "The account  sort by account number, first name,last name,last name,area", required = true)
     								@RequestParam(value = "sort", required = true, defaultValue = DEFAULT_PAGE_SORT) Sort.Direction sortDirection ,
@@ -203,7 +210,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Get acccount by Id.", notes = "It will provide of account.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> getAccountById(@ApiParam(value = "The account by Id", required = true)
 										@PathVariable("accountId") Long accountId,
@@ -234,7 +241,7 @@ public class AccountRestController extends AbstractRestHandler {
 		accountInfo.setPresentAddress(account.getPresentAddress());
 		accountInfo.setState(account.getState());
 		
-		LOGGER.info("--- ---");
+		LOGGER.info("--- account info return sucessfully ---");
 		return new ResponseEntity<>(accountInfo,HttpStatus.OK);
 	}
 	
@@ -249,7 +256,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Create new account .", notes = "provide valid  account Object.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> createDatabase(@ApiParam(value = "The account info object", required = true)
 									@RequestBody AccountInfo accountInfo,
@@ -321,7 +328,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Update new account .", notes = "provide valid  account Object.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> updateDatabase(@ApiParam(value = "The account Id", required = true)
 										@PathVariable("accountId") final Long accountId,
@@ -390,7 +397,7 @@ public class AccountRestController extends AbstractRestHandler {
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
     @ApiOperation(value = "Delete account by Id.", notes = "provide valid account id.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
-	//@PreAuthorize("hasAnyRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN')")
     public    @ResponseBody
     ResponseEntity<?> deleteDatabaseById(@ApiParam(value = "The account by Id", required = true)
 										@PathVariable("accountId") final Long accountId,
@@ -414,5 +421,55 @@ public class AccountRestController extends AbstractRestHandler {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
+	
+	
+	@RequestMapping(value = "/{accountId}/histories",
+            method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    @ApiOperation(value = "Get History by account Id.", notes = "provide valid account id.")
+	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
+	@PreAuthorize("hasAnyRole('ADMIN')")
+    public    @ResponseBody
+    ResponseEntity<?> getAccountHistoriesById(@ApiParam(value = "The account by Id", required = true)
+										@PathVariable("accountId") final Long accountId,
+										@ApiParam(value = "The account  sort by account number, first name,last name,last name,area", required = true)
+	    								@RequestParam(value = "sort", required = true, defaultValue = DEFAULT_PAGE_SORT) Sort.Direction sortDirection ,
+										final HttpServletRequest request,final HttpServletResponse response) {
+		LOGGER.info("--- get account history by Id rest controller invoked , accountId -> {} , sort -> {}  ---",accountId,sortDirection);
+		
+		Account account=this.accountService.getAccountById(accountId);
+		if(account==null){
+			LOGGER.info("--- account does not exist's ---");
+			throw new ResourceNotFoundException("account does not exist's ...!");
+		}
+		
+		Sort sort=new Sort(sortDirection,"transactionDate");
+		List<DayBook> dayBooks=this.dayBookService.getAllDayBookByAccount(account, sort);
+		
+		List<DayBookInfo> dayBookInfos=new ArrayList<DayBookInfo>();
+	    dayBooks.forEach(dayBook -> {
+	    		DayBookInfo dayBookInfo=new DayBookInfo();
+	    		
+	    		dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
+	    		dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
+	    		dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
+	    		dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
+	    		dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
+	    		dayBookInfo.setDayBookId(dayBook.getDayBookId());
+	    		dayBookInfo.setModifiedBy(dayBook.getModifiedBy()!=null?dayBook.getModifiedBy().getFirstName():null);
+	    		dayBookInfo.setModifiedDate(dayBook.getModifiedDate());
+	    		dayBookInfo.setTransactionAmount(dayBook.getTransactionAmount());
+	    		dayBookInfo.setTransactionDate(dayBook.getTransactionDate());
+	    		dayBookInfo.setTransactionDesc(dayBook.getTransactionDesc());
+	    		dayBookInfo.setTransactionType(dayBook.getTransactionType()!=null?dayBook.getTransactionType().name():null);
+	    		
+	    		dayBookInfos.add(dayBookInfo);
+	    });
+	    
+	    
+
+		LOGGER.info("--- daybook info for current account ---");
+		return new ResponseEntity<>(dayBookInfos,HttpStatus.OK);
+	}
 
 }

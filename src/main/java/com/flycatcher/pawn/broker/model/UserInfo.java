@@ -80,7 +80,7 @@ public class UserInfo implements Serializable {
 	private Set<DayBook> modifiedDayBooks;
 
 	//bi-directional many-to-many association to Role
-	@ManyToMany(mappedBy="userInfos",fetch=FetchType.LAZY)
+	@ManyToMany(mappedBy="userInfos",fetch=FetchType.EAGER)
 	@JsonIgnore
 	private Set<Role> roles;
 

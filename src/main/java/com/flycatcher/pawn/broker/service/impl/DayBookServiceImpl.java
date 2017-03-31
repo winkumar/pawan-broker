@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import com.flycatcher.pawn.broker.model.Account;
 import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.repo.DayBookRepository;
 import com.flycatcher.pawn.broker.service.DayBookService;
@@ -69,6 +70,12 @@ public class DayBookServiceImpl implements DayBookService {
 	public void removeDayBookById(Long dayBookId) {
 		LOGGER.debug("--- remove daybook by dayBookId -> {} ---",dayBookId);
 		this.dayBookRepository.delete(dayBookId);
+	}
+
+	@Override
+	public List<DayBook> getAllDayBookByAccount(Account account, Sort sort) {
+		LOGGER.debug("--- get daybook by account -> {} , sort -> {} ---",account,sort);
+		return this.dayBookRepository.findByAccount(account, sort);
 	}
 
 }

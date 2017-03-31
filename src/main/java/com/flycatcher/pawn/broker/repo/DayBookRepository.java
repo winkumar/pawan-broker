@@ -1,10 +1,14 @@
 package com.flycatcher.pawn.broker.repo;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.flycatcher.pawn.broker.model.Account;
 import com.flycatcher.pawn.broker.model.DayBook;
 
 /**
@@ -23,6 +27,8 @@ public interface DayBookRepository extends JpaRepository<DayBook, Long> {
             +" LOWER(d.account.accountNumber) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(d.createdDate) LIKE LOWER(CONCAT('%',?1, '%')))" )
 	Page<DayBook> findDayBookByPage(String search,Pageable pageable);
+	
+	List<DayBook> findByAccount(Account account,Sort sort);
 }
 
 

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.flycatcher.pawn.broker.model.Account;
 import com.flycatcher.pawn.broker.model.DayBook;
 
 /**
@@ -22,6 +23,7 @@ public interface DayBookService {
 	DayBook getDayBookById(Long dayBookId);
 	DayBook createOrUpdateDayBook(DayBook dayBook);
 	void removeDayBookById(Long dayBookId);
+	List<DayBook> getAllDayBookByAccount(Account account,Sort sort);
 
 }
 

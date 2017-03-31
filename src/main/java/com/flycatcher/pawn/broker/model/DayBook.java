@@ -7,7 +7,6 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.EqualsAndHashCode;
@@ -46,7 +45,7 @@ public class DayBook implements Serializable {
 	private Date modifiedDate;
 
 	@Column(name="transaction_amount")
-	private BigDecimal transactionAmount;
+	private Double transactionAmount;
 
 	@Column(name="transaction_desc")
 	private String transactionDesc;

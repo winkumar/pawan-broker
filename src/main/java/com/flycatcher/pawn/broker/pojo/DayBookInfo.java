@@ -1,7 +1,6 @@
 package com.flycatcher.pawn.broker.pojo;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.EqualsAndHashCode;
@@ -32,10 +31,10 @@ public class DayBookInfo implements Serializable{
 	private Long dayBookId;
 	private Date createdDate;
 	private Date modifiedDate;
-	private BigDecimal transactionAmount;
+	private Double transactionAmount;
 	private String transactionDesc;
 	
-	private Enum transactionType;
+	private String transactionType;
 	private Date transactionDate;
 	private String createdBy;
 	private String modifiedBy;
