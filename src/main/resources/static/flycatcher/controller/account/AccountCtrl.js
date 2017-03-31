@@ -45,7 +45,7 @@
         $scope.isValidate=function(myform,ele){
         	if(myform.$dirty && ele.$touched && ele.$invalid)
         		return true;
-        	return false;
+        	 return false;
         }
         
     });
