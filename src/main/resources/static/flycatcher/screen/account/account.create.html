@@ -9,7 +9,7 @@
 					</div>
 					<div class="panel-body">
 						<form class="form-horizontal fv-form fv-form-bootstrap"
-							id="myform">
+							id="myform" name='myform'>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Date</label>
 								<div class="col-sm-8">
@@ -20,63 +20,144 @@
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Name</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control" ng-model="account.name"
-										id="name">
+									<input type="text" 
+									 class="form-control" 
+									 ng-model="account.name" 
+									 id="username" 
+									 name="username" 
+									 required
+									 ng-class="{errors: isValidate(myform,myform.username)}"/>
+									<div class='errorText' 
+									ng-messages="myform.username.$error"
+									ng-if="myform.username.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
+
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Fathers Name</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control"
-										ng-model="account.fathername" id="fathername">
+									<input 
+									type="text" 
+									class="form-control"
+									ng-model="account.fathername" 
+									id="fathername"
+									name="fathername"
+									required
+									ng-class="{errors: isValidate(myform,myform.fathername)}"/>
+									<div class='errorText' 
+									ng-messages="myform.fathername.$error"
+									ng-if="myform.fathername.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Door No / Street</label>
-								<div class="col-sm-8 label_right">
-									<input type="text" class="form-control"
-										ng-model="account.address" id="address">
+								<div class="col-sm-8">
+									<input 
+									type="text" 
+									class="form-control"
+									ng-model="account.address" 
+									id="address"
+									name="address"
+									required
+									ng-class="{errors: isValidate(myform,myform.address)}"/>
+									<div class='errorText' 
+									ng-messages="myform.address.$error"
+									ng-if="myform.address.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Area</label>
-								<div class="col-sm-8 label_right">
-									<input type="text" class="form-control" ng-model="account.area"
-										id="area">
+								<div class="col-sm-8">
+									<input 
+									type="text" 
+									class="form-control" 
+									ng-model="account.area"
+									id="area"
+									name="area"
+									required
+									ng-class="{errors: isValidate(myform,myform.area)}"/>
+									<div class='errorText' 
+									ng-messages="myform.area.$error"
+									ng-if="myform.area.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">City</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control" ng-model="account.city"
-										id="city">
+									<input 
+									type="text" 
+									class="form-control" 
+									ng-model="account.city"
+									id="city"
+									name="city"/>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">State</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control"
-										ng-model="account.state" id="state">
+									<input 
+									type="text" 
+									class="form-control"
+									ng-model="account.state" 
+									id="state"
+									name="state" 
+									required
+									ng-class="{errors: isValidate(myform,myform.state)}"/>
+									<div class='errorText' 
+									ng-messages="myform.state.$error"
+									ng-if="myform.state.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Pincode</label>
-								<div class="col-sm-8 label_right">
-									<input type="text" class="form-control"
-										ng-model="account.pincode" id="pincode">
+								<div class="col-sm-8">
+									<input 
+									type="text" 
+									class="form-control"
+									ng-model="account.pincode" 
+									id="pincode"
+									name="pincode"
+									required
+									ng-class="{errors: isValidate(myform,myform.pincode)}"/>
+									<div class='errorText' 
+									ng-messages="myform.pincode.$error"
+									ng-if="myform.pincode.$touched">
+										<div ng-message="required">Field is Required</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Remarks</label>
 								<div class="col-sm-8">
-									<textarea class="form-control" id="inputEmail3"
-										ng-model="account.remarks" rows="5" cols="20"></textarea>
+									<textarea 
+									class="form-control" 
+									id="inputEmail3"
+									ng-model="account.remarks" 
+									rows="5" 
+									cols="20"
+									id="remarks"
+									name="remarks"></textarea>
 								</div>
 							</div>
 							<div class="form-group ">
 								<span class="col-sm-10"></span>
-								<button type="button" class="btn btn-primary"
-									ng-click="addAccount(account)">Save</button>
+								<button 
+								type="button" 
+								class="btn btn-primary"
+								ng-disabled='myform.$invalid'
+								ng-click="addAccount(account)">
+								Save
+								</button>
 							</div>
 						</form>
 					</div>
