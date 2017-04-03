@@ -95,10 +95,11 @@
 								<tr ng-repeat="daybook in dayBookList | filter : searchText | limitTo : 5">
 									<td align="center">
 									<a class="btn btn-default" ng-click="edit(ac)"><em class="fa fa-pencil"></em></a> 
-									<a class="btn btn-danger" ng-click="deleteAccount($index)">
-									<em class="fa fa-trash"></em></a></td>
+									<a class="btn btn-danger" ng-click="deleteAccount($index)"><em class="fa fa-trash"></em></a>
+									</td>
 									<td ng-bind="daybook.date"></td>
 									<td ng-bind="daybook.account"></td>
+									<td ng-bind="daybook.accountNumber"></td>
 									<td ng-bind="daybook.amount"></td>
 									<td ng-bind="daybook.amount"></td>
 								</tr>

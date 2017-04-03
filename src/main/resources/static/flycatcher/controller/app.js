@@ -1,3 +1,4 @@
+'use strict';
 
 angular.module('myApp.account',['ngMessages']);
 angular.module('myApp.login',[]);
@@ -6,6 +7,7 @@ angular.module('myApp.journal',[]);
 
 var denpency = [
 				'ngRoute',
+				'ngIdle',
 				'ngCookies',
 				'ngResource',
 				'ngSanitize',
@@ -26,14 +28,24 @@ myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
     .otherwise({redirectTo: '/'})
 });
 
-myApp.run(function(api) {
-	api.init();				
+myApp.config(function(IdleProvider, KeepaliveProvider) {
+	 IdleProvider.idle(5);
+	 IdleProvider.timeout(5);
+	 KeepaliveProvider.interval(10);
+});
+
+myApp.run(function(Idle,api,$rootScope,$window) {
+	  api.init();
+	  Idle.watch();
+	  $rootScope.$on('IdleTimeout', function(){
+		  $window.location.href ="/";
+	  });
 });
 
 myApp.factory('api', function($http, $cookieStore) {
 	return {
 		init : function(token) {
-			$http.defaults.headers.common['X-Access-Token'] = token || $cookieStore.token;
+			$http.defaults.headers.common['X-Access-Token'] = token || $cookieStore.get('token');
 		}
 	};
 });
