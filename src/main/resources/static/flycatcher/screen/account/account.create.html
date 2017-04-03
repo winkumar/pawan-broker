@@ -8,67 +8,70 @@
 						<h3 class="panel-title">Account</h3>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal fv-form fv-form-bootstrap"
-							id="myform" name='myform'>
-							<div class="form-group">
+						<form 
+						class="form-horizontal fv-form fv-form-bootstrap" 
+						id="myform" 
+						name='myform' 
+						ng-init="init()">
+							<!-- <div class="form-group">
 								<label class="col-sm-4 label_right">Date</label>
 								<div class="col-sm-8">
 									<input type="date" class="form-control" ng-model="account.date"
 										id="date" />
 								</div>
-							</div>
+							</div> -->
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Name</label>
 								<div class="col-sm-8">
 									<input type="text" 
 									 class="form-control" 
-									 ng-model="account.name" 
-									 id="username" 
-									 name="username" 
+									 ng-model="account.firstName" 
+									 id="firstName" 
+									 name="firstName" 
 									 required
-									 ng-class="{errors: isValidate(myform,myform.username)}"/>
-									<div class='errorText' 
-									ng-messages="myform.username.$error"
-									ng-if="myform.username.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
+									 ng-class="{errors: isValidate(myform,myform.firstName)}"/>
 								</div>
 
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 label_right">Fathers Name</label>
+								<label class="col-sm-4 label_right">Father's Name</label>
 								<div class="col-sm-8">
 									<input 
 									type="text" 
 									class="form-control"
-									ng-model="account.fathername" 
+									ng-model="account.fatherName" 
 									id="fathername"
 									name="fathername"
 									required
 									ng-class="{errors: isValidate(myform,myform.fathername)}"/>
-									<div class='errorText' 
-									ng-messages="myform.fathername.$error"
-									ng-if="myform.fathername.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 label_right">Door No / Street</label>
+								<label class="col-sm-4 label_right">Permanent Address</label>
 								<div class="col-sm-8">
-									<input 
-									type="text" 
-									class="form-control"
-									ng-model="account.address" 
-									id="address"
-									name="address"
+								<textarea 
+									class="form-control" 
+									id="currentAddress"
+									name="currentAddress"
+									ng-model="account.currentAddress" 
+									rows="2" 
+									cols="20"
 									required
-									ng-class="{errors: isValidate(myform,myform.address)}"/>
-									<div class='errorText' 
-									ng-messages="myform.address.$error"
-									ng-if="myform.address.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
+									ng-class="{errors: isValidate(myform,myform.currentAddress)}"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 label_right">Residential  Address</label>
+								<div class="col-sm-8">
+								<textarea 
+									class="form-control" 
+									id="presentAddress"
+									name="presentAddress"
+									ng-model="account.presentAddress" 
+									rows="2" 
+									cols="20"
+									required
+									ng-class="{errors: isValidate(myform,myform.presentAddress)}"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -82,11 +85,6 @@
 									name="area"
 									required
 									ng-class="{errors: isValidate(myform,myform.area)}"/>
-									<div class='errorText' 
-									ng-messages="myform.area.$error"
-									ng-if="myform.area.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
 								</div>
 							</div>
 							<div class="form-group">
@@ -111,11 +109,6 @@
 									name="state" 
 									required
 									ng-class="{errors: isValidate(myform,myform.state)}"/>
-									<div class='errorText' 
-									ng-messages="myform.state.$error"
-									ng-if="myform.state.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
 								</div>
 							</div>
 							<div class="form-group">
@@ -124,29 +117,11 @@
 									<input 
 									type="text" 
 									class="form-control"
-									ng-model="account.pincode" 
-									id="pincode"
-									name="pincode"
+									ng-model="account.pinCode" 
+									id="pinCode"
+									name="pinCode"
 									required
-									ng-class="{errors: isValidate(myform,myform.pincode)}"/>
-									<div class='errorText' 
-									ng-messages="myform.pincode.$error"
-									ng-if="myform.pincode.$touched">
-										<div ng-message="required">Field is Required</div>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Remarks</label>
-								<div class="col-sm-8">
-									<textarea 
-									class="form-control" 
-									id="inputEmail3"
-									ng-model="account.remarks" 
-									rows="5" 
-									cols="20"
-									id="remarks"
-									name="remarks"></textarea>
+									ng-class="{errors: isValidate(myform,myform.pinCode)}"/>
 								</div>
 							</div>
 							<div class="form-group ">
@@ -190,17 +165,15 @@
 								<th>Area</th>
 							</thead>
 							<tbody>
-								<tr
-									ng-repeat="ac in accountList | filter : searchText | limitTo : 5">
-									<td align="center"><a class="btn btn-default"
-										ng-click="edit(ac)"><em class="fa fa-pencil"></em></a> <a
-										class="btn btn-danger" ng-click="deleteAccount($index)"><em
-											class="fa fa-trash"></em></a></td>
-									<td ng-bind="ac.accountNo"></td>
-									<td ng-bind="ac.name"></td>
-									<td ng-bind="ac.fathername"></td>
-									<td ng-bind="ac.address"></td>
-									<td ng-bind="ac.area"></td>
+								<tr ng-repeat="account in accountDetails.accountInfos | filter : searchText | limitTo : 5">
+									<td align="center">
+									<a class="btn btn-default" ng-click="edit(account)"><em class="fa fa-pencil"></em></a>
+									<a class="btn btn-danger" ng-click="deleteAccount($index)"><em class="fa fa-trash"></em></a></td>
+									<td ng-bind="account.accountNumber"></td>
+									<td ng-bind="account.firstName"></td>
+									<td ng-bind="account.fatherName"></td>
+									<td ng-bind="account.currentAddress"></td>
+									<td ng-bind="account.area"></td>
 								</tr>
 							</tbody>
 						</table>

@@ -1,27 +1,32 @@
 'use strict';
 (function () {
-    angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location) {
+    angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location,$rootScope,$cookieStore,api) {
+    	$scope.accountDetails = null;
+    	$scope.init = function(){
+      	   var url = "/api/v1/accounts?page=0&size=4&sort=ASC";
+      	   $http({
+  	    	    method: 'GET',
+  	    	    url: url,
+  	    	}).success(function(data, status, headers, config){
+  	    		$scope.accountDetails = data;
+  	    	}).error(function(data, status, headers, config){
+  	    	});
+         };
         var compdata = [];
         $scope.editMode = false;
-        //   $http.get('controllers/data.json').success(function(data) {
-        //       for(var i=0;i<data.length;i++){
-        //             compdata.push(data[i]);
-        //       }
-        //     });   
         $scope.account = {
-            "date": "",
-            "accountNo": "AC101",
-            "name": "tomato",
-            "fathername": "ffdfs",
-            "address": "m nagar",
-            "area": "vilupuram",
-            "city": "",
-            "state": "",
-            "pincode": "",
-            "remarks": ""
-        };
+        	  "area": "string",
+        	  "city": "string",
+        	  "currentAddress": "string",
+        	  "fatherName": "string",
+        	  "firstName": "string",
+        	  "lastName": "string",
+        	  "pinCode": "string",
+        	  "presentAddress": "string",
+        	  "state": "string"
+        	}
         compdata.push($scope.account);
-        $scope.accountList = compdata;
+        $scope.accountList = null;
         $scope.account = null;
         $scope.deleteAccount = function (index) {
             $scope.accountList.splice(index, 1);
@@ -47,6 +52,6 @@
         		return true;
         	 return false;
         }
-        
+       
     });
 } ());

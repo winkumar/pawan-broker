@@ -12,26 +12,38 @@
 							<div class="form-group">
 								<label class="col-sm-4 label_right">User Name</label>
 								<div class="col-sm-8">
-									<input type="text" name="userName" ng-model="userName"
-										class="form-control" id="userName" />
+									<input 
+									type="text" 
+									name="username" 
+									ng-model="username" 
+									class="form-control" 
+									id="username" />
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 label_right">Password</label>
 								<div class="col-sm-8">
-									<input type="password" name="password" ng-model="password"
-										class="form-control" id="password" />
+									<input 
+									type="password" 
+									name="password" 
+									ng-model="password"
+									class="form-control" 
+									id="password" />
 								</div>
+							</div>
+							<div class="col-sm-12" style='margin-left:120px;color:red;' ng-if="(errormessage)">
+								  <label ng-bind='errormessage'></label>
 							</div>
 							<div class="form-group ">
 								<div class="col-sm-4">
 									<button type="button" class="btn btn-primary pull-right"
-										ng-click="getNextPage($myform)">Save</button>
+										ng-click="login()">Save</button>
 								</div>
 								<div class="col-sm-4">
 									<button type="button" class="btn btn-primary">Cancel</button>
 								</div>
 							</div>
+							
 						</form>
 					</div>
 				</div>

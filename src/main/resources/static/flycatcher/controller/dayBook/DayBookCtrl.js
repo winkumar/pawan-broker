@@ -1,7 +1,6 @@
 'use strict';
 (function() {
-	angular.module('myApp.account').controller('DayBookCtrl',
-			function($scope, $http, $attrs, $location) {
+	angular.module('myApp.account').controller('DayBookCtrl', function($scope, $http, $attrs, $location) {
 				$scope.daybook = {
 					'date':'',
 					'account':'',

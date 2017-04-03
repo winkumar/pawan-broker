@@ -22,8 +22,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-/.gitignore
-/.mvn/
-/README.md
-/pom.xml
 /src/
