@@ -47,21 +47,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 label_right">Permanent Address</label>
-								<div class="col-sm-8">
-								<textarea 
-									class="form-control" 
-									id="currentAddress"
-									name="currentAddress"
-									ng-model="account.currentAddress" 
-									rows="2" 
-									cols="20"
-									required
-									ng-class="{errors: isValidate(myform,myform.currentAddress)}"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Residential  Address</label>
+								<label class="col-sm-4 label_right">Present Address</label>
 								<div class="col-sm-8">
 								<textarea 
 									class="form-control" 
@@ -72,6 +58,20 @@
 									cols="20"
 									required
 									ng-class="{errors: isValidate(myform,myform.presentAddress)}"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 label_right">Current  Address</label>
+								<div class="col-sm-8">
+								<textarea 
+									class="form-control" 
+									id="currentAddress"
+									name="currentAddress"
+									ng-model="account.currentAddress" 
+									rows="2" 
+									cols="20"
+									required
+									ng-class="{errors: isValidate(myform,myform.currentAddress)}"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -130,7 +130,7 @@
 								type="button" 
 								class="btn btn-primary"
 								ng-disabled='myform.$invalid'
-								ng-click="addAccount(account)">
+								ng-click="addAccount(myform,account)">
 								Save
 								</button>
 							</div>
@@ -168,7 +168,7 @@
 								<tr ng-repeat="account in accountDetails.accountInfos | filter : searchText | limitTo : 5">
 									<td align="center">
 									<a class="btn btn-default" ng-click="edit(account)"><em class="fa fa-pencil"></em></a>
-									<a class="btn btn-danger" ng-click="deleteAccount($index)"><em class="fa fa-trash"></em></a></td>
+									<a class="btn btn-danger" ng-click="deleteAccount(account.accountId)"><em class="fa fa-trash"></em></a></td>
 									<td ng-bind="account.accountNumber"></td>
 									<td ng-bind="account.firstName"></td>
 									<td ng-bind="account.fatherName"></td>

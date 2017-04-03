@@ -27,7 +27,7 @@ myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
 });
 
 myApp.run(function(api) {
-	api.init();
+	api.init();				
 });
 
 myApp.factory('api', function($http, $cookieStore) {

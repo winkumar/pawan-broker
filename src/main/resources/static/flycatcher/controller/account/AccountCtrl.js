@@ -2,8 +2,12 @@
 (function () {
     angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location,$rootScope,$cookieStore,api) {
     	$scope.accountDetails = null;
+    	$scope.account = null;
+    	$scope.editMode = false;
+    	
     	$scope.init = function(){
-      	   var url = "/api/v1/accounts?page=0&size=4&sort=ASC";
+    	   api.init($cookieStore.get('token'));
+    	   var url = "/api/v1/accounts?page=0&size=4&sort=ASC";
       	   $http({
   	    	    method: 'GET',
   	    	    url: url,
@@ -12,46 +16,68 @@
   	    	}).error(function(data, status, headers, config){
   	    	});
          };
-        var compdata = [];
-        $scope.editMode = false;
-        $scope.account = {
-        	  "area": "string",
-        	  "city": "string",
-        	  "currentAddress": "string",
-        	  "fatherName": "string",
-        	  "firstName": "string",
-        	  "lastName": "string",
-        	  "pinCode": "string",
-        	  "presentAddress": "string",
-        	  "state": "string"
-        	}
-        compdata.push($scope.account);
-        $scope.accountList = null;
-        $scope.account = null;
-        $scope.deleteAccount = function (index) {
-            $scope.accountList.splice(index, 1);
-            $scope.account = null;
-        }
-        $scope.addAccount = function (data) {
-            if (!$scope.editMode) {
-                data.accountNo = "AC102";
-                compdata.push(data);
-                $scope.accountList = compdata;
-            }
-            $scope.editMode = false;
-            $scope.account = null;
-        }
+         
+        $scope.deleteAccount = function (accountId) {
+        	var url = "/api/v1/accounts/"+accountId
+        	   $http({
+    	    	    method: 'DELETE',
+    	    	    url: url,
+    	    	}).success(function(data, status, headers, config){
+    	    		$scope.init();
+    	    		$scope.editMode = false;
+    	    	}).error(function(data, status, headers, config){
+    	    	})
+        };
+        
+        $scope.addAccount = function (myform,account) {
+           if($scope.editMode){
+        	   $scope.editAndSave(myform,account);
+           }else{
+        	   $scope.saveAccount(myform,account);
+           }
+        };
 
         $scope.edit = function (account) {
-            $scope.editMode = true;
-            $scope.account = account;
-        }
+        	$scope.editMode = true;
+        	$scope.account = account;
+        };
         
+        $scope.editAndSave = function (myform,account) {
+          var url = "/api/v1/accounts/"+account.accountId
+       	   $http({
+   	    	    method: 'PUT',
+   	    	    url: url,
+   	    	    data : account,
+   	    	}).success(function(data, status, headers, config){
+   	    		$scope.init();
+   	    		$scope.account =null;
+   	    		$scope.editMode = false;
+   	    		myform.$dirty = false;
+   	    	}).error(function(data, status, headers, config){
+   	    	});
+        };
+        
+        $scope.saveAccount = function (myform,account) {
+        	account.lastName = account.firstName;
+            var url = "/api/v1/accounts";
+            $http({
+	    	    method: 'POST',
+	    	    url: url,
+	    	    data : account,
+	    	}).success(function(data, status, headers, config){
+	    		$scope.init();
+	    		$scope.account =null;
+	    		myform.$dirty = false;
+	    	}).error(function(data, status, headers, config){
+	    	});
+         };
+         
+         
         $scope.isValidate=function(myform,ele){
         	if(myform.$dirty && ele.$touched && ele.$invalid)
         		return true;
-        	 return false;
-        }
-       
+        	return false;
+        };
+        
     });
 } ());
