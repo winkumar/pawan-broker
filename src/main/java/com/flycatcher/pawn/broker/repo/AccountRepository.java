@@ -2,10 +2,14 @@ package com.flycatcher.pawn.broker.repo;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.AccountType;
+
+import java.util.List;
 
 /**
  * <p> Account Repository </p>
@@ -26,6 +30,9 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             +" LOWER(a.city) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(a.fatherName) LIKE LOWER(CONCAT('%',?1, '%')))" )
 	Page<Account> findAccountByPage(String search,Pageable pageable);
+	
+	
+	List<Account> findByAccountType(AccountType accounttype,Sort sort);
 }
 
 

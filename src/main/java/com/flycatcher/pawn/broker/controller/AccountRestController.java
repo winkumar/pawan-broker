@@ -38,12 +38,14 @@ import com.flycatcher.pawn.broker.exception.DataFormatException;
 import com.flycatcher.pawn.broker.exception.ResourceAlreadyExistException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.AccountType;
 import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.model.UserInfo;
 import com.flycatcher.pawn.broker.pojo.AccountInfo;
 import com.flycatcher.pawn.broker.pojo.AccountPageInfo;
 import com.flycatcher.pawn.broker.pojo.DayBookInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
+import com.flycatcher.pawn.broker.service.AccountTypeService;
 import com.flycatcher.pawn.broker.service.DayBookService;
 import com.flycatcher.pawn.broker.service.UserInfoService;
 
@@ -63,15 +65,17 @@ public class AccountRestController extends AbstractRestHandler {
 	private final AccountService accountService;
 	private final DayBookService dayBookService;
 	private final UserInfoService userInfoService;
+	private final AccountTypeService accountTypeService;
 	
 	@Autowired
 	public AccountRestController(final AccountService accountService,final UserInfoService userInfoService,
-								final DayBookService dayBookService){
+								final DayBookService dayBookService,final AccountTypeService accountTypeService){
 		LOGGER.info("--- AccountRestController Invoked ---");
 		
 		this.accountService=accountService;
 		this.userInfoService=userInfoService;
 		this.dayBookService=dayBookService;
+		this.accountTypeService=accountTypeService;
 								
 	}
 	
@@ -105,6 +109,7 @@ public class AccountRestController extends AbstractRestHandler {
 		List<Account> accounts=accountPage.getContent();
 		
 		List<AccountInfo> accountInfos=new ArrayList<AccountInfo>();
+		if(accounts!=null){
 		accounts.forEach(account ->{
 			AccountInfo accountInfo=new AccountInfo();
 			
@@ -124,10 +129,13 @@ public class AccountRestController extends AbstractRestHandler {
 			accountInfo.setPresentAddress(account.getPresentAddress());
 			accountInfo.setState(account.getState());
 			
+			if(account.getAccountType()!=null)
+				accountInfo.setAccountTypeId(account.getAccountType().getId());
+			
 			
 			accountInfos.add(accountInfo);
 		});
-		
+		}
 		long totalPages=accountPage.getTotalPages();
 		long pageNumber=accountPage.getNumber();
 		long numberOfElements=accountPage.getNumberOfElements();
@@ -172,6 +180,8 @@ public class AccountRestController extends AbstractRestHandler {
 		Sort sort=new Sort(sortDirection,"accountNumber","firstName","lastName","area");
 		List<Account> accounts=this.accountService.getAllAccount(sort);
 		List<AccountInfo> accountInfos=new ArrayList<AccountInfo>();
+		
+		if(accounts!=null){
 		accounts.forEach(account ->{
 			AccountInfo accountInfo=new AccountInfo();
 			
@@ -191,10 +201,13 @@ public class AccountRestController extends AbstractRestHandler {
 			accountInfo.setPresentAddress(account.getPresentAddress());
 			accountInfo.setState(account.getState());
 			
+			if(account.getAccountType()!=null)
+				accountInfo.setAccountTypeId(account.getAccountType().getId());
+			
 			
 			accountInfos.add(accountInfo);
 		});
-		
+		}
 		
 		LOGGER.info("--- account list return successfully ---");
 		return new ResponseEntity<>(accountInfos,HttpStatus.OK);
@@ -241,6 +254,10 @@ public class AccountRestController extends AbstractRestHandler {
 		accountInfo.setPresentAddress(account.getPresentAddress());
 		accountInfo.setState(account.getState());
 		
+		if(account.getAccountType()!=null)
+			accountInfo.setAccountTypeId(account.getAccountType().getId());
+		
+		
 		LOGGER.info("--- account info return sucessfully ---");
 		return new ResponseEntity<>(accountInfo,HttpStatus.OK);
 	}
@@ -263,10 +280,21 @@ public class AccountRestController extends AbstractRestHandler {
 									HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- create account rest controller invoked , account -> {} ---",accountInfo);
 		
-		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty() || accountInfo.getLastName()==null || accountInfo.getLastName().isEmpty())
+		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty())
 		{
 			LOGGER.info("--- first name or last name is empty or null ---");
 			throw new DataFormatException("first name (or) last name is doesn't exist's ...!");
+		}
+		
+		if(accountInfo.getAccountTypeId()==null){
+			LOGGER.info("--- account type does not exist's  ---");
+			throw new DataFormatException("account type doesn't exist's ...!");
+		}
+		
+		AccountType accountType=this.accountTypeService.getAccountType(accountInfo.getAccountTypeId());
+		if(accountType==null){
+			LOGGER.info("--- account type does not exist's , account type id -> {}  ---",accountInfo.getAccountTypeId());
+			throw new DataFormatException("account type doesn't exist's ...!");
 		}
 		
 		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
@@ -301,10 +329,11 @@ public class AccountRestController extends AbstractRestHandler {
 		account.setCreatedBy(createdBy);
 		account.setModifiedDate(new Date());
 		account.setModifiedBy(createdBy);
+		account.setAccountType(accountType);
 		
 		Account createdAccount=this.accountService.createOrUpdateAccount(account);		
 		if(createdAccount!=null){
-			createdAccount.setAccountNumber("ACC"+createdAccount.getAccountId());
+			createdAccount.setAccountNumber(accountType.getAccStartFrom()+createdAccount.getAccountId());
 			Account updateAccount=this.accountService.createOrUpdateAccount(createdAccount);
 			LOGGER.debug("--- created account object -> {}  ---",updateAccount);
 		}
@@ -343,10 +372,21 @@ public class AccountRestController extends AbstractRestHandler {
 			throw new ResourceNotFoundException("account does not exist's ...!");
 		}
 		
-		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty() || accountInfo.getLastName()==null || accountInfo.getLastName().isEmpty())
+		if(accountInfo.getFirstName()==null || accountInfo.getFirstName().isEmpty() )
 		{
 			LOGGER.info("--- first name or last name is empty or null ---");
 			throw new DataFormatException("first name (or) last name is doesn't exist's ...!");
+		}
+		
+		if(accountInfo.getAccountTypeId()==null){
+			LOGGER.info("--- account type does not exist's  ---");
+			throw new DataFormatException("account type doesn't exist's ...!");
+		}
+		
+		AccountType accountType=this.accountTypeService.getAccountType(accountInfo.getAccountTypeId());
+		if(accountType==null){
+			LOGGER.info("--- account type does not exist's , account type id -> {}  ---",accountInfo.getAccountTypeId());
+			throw new DataFormatException("account type doesn't exist's ...!");
 		}
 		
 		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
@@ -375,6 +415,7 @@ public class AccountRestController extends AbstractRestHandler {
 		account.setArea(accountInfo.getArea());
 		account.setCity(account.getCity());
 		account.setState(accountInfo.getState());
+		account.setAccountType(accountType);
 		//account.setCreatedDate(new Date());
 		//account.setCreatedBy(createdBy);
 		account.setModifiedDate(new Date());
@@ -402,7 +443,7 @@ public class AccountRestController extends AbstractRestHandler {
     ResponseEntity<?> deleteDatabaseById(@ApiParam(value = "The account by Id", required = true)
 										@PathVariable("accountId") final Long accountId,
 										final HttpServletRequest request,final HttpServletResponse response) {
-		LOGGER.info("--- get account by Id rest controller invoked , accountId -> {} ---",accountId);
+		LOGGER.info("--- delete account by Id rest controller invoked , accountId -> {} ---",accountId);
 		
 		Account account=this.accountService.getAccountById(accountId);
 		if(account==null){
@@ -415,7 +456,6 @@ public class AccountRestController extends AbstractRestHandler {
 			throw new ResourceAlreadyExistException("account already used some daybook ...!");
 		}
 		
-				
 		this.accountService.removeAccountById(accountId);
 		
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -447,6 +487,7 @@ public class AccountRestController extends AbstractRestHandler {
 		List<DayBook> dayBooks=this.dayBookService.getAllDayBookByAccount(account, sort);
 		
 		List<DayBookInfo> dayBookInfos=new ArrayList<DayBookInfo>();
+		if(dayBooks!=null){
 	    dayBooks.forEach(dayBook -> {
 	    		DayBookInfo dayBookInfo=new DayBookInfo();
 	    		
@@ -466,8 +507,8 @@ public class AccountRestController extends AbstractRestHandler {
 	    		dayBookInfos.add(dayBookInfo);
 	    });
 	    
-	    
-
+	    }
+		
 		LOGGER.info("--- daybook info for current account ---");
 		return new ResponseEntity<>(dayBookInfos,HttpStatus.OK);
 	}

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.AccountType;
 import com.flycatcher.pawn.broker.repo.AccountRepository;
 import com.flycatcher.pawn.broker.service.AccountService;
 
@@ -70,6 +71,12 @@ public class AccountServiceImpl implements AccountService {
 	public void removeAccountById(Long accountId) {
 		LOGGER.debug("--- remove account by id -> {} ---",accountId);
 		this.accountRepository.delete(accountId);
+	}
+
+	@Override
+	public List<Account> getAllAccount(AccountType accountType, Sort sort) {
+		LOGGER.debug("--- get all account by accountType -> {} , sort -> {} ---",accountType,sort);
+		return this.accountRepository.findByAccountType(accountType,sort);
 	}
 
 }

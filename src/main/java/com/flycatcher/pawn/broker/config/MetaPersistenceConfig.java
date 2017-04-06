@@ -169,6 +169,7 @@ public class MetaPersistenceConfig {
         final Properties properties = new Properties();
         properties.setProperty("hibernate.dialect",dialect );
         properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", loadMetaData);
+        properties.put("hibernate.enable_lazy_load_no_trans", true);
         
         
         return properties;
