@@ -58,6 +58,8 @@ public class AccountInfo implements Serializable{
 
 	private String modifiedBy;
 	
+	private Long accountTypeId;
+	
 	
 }
 

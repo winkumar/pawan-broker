@@ -58,15 +58,17 @@ public class DayBookServiceImpl implements DayBookService {
 		return this.dayBookRepository.findOne(dayBookId);
 	}
 
-	@Transactional(propagation=Propagation.REQUIRED,readOnly=false)
+	
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,readOnly=false)
 	public DayBook createOrUpdateDayBook(DayBook dayBook) {
 		LOGGER.debug("--- create or update day book , daybook -> {} ---",dayBook);
 		return this.dayBookRepository.saveAndFlush(dayBook);
 	}
 
-	@Transactional(propagation=Propagation.REQUIRED,readOnly=false)
+	
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,readOnly=false)
 	public void removeDayBookById(Long dayBookId) {
 		LOGGER.debug("--- remove daybook by dayBookId -> {} ---",dayBookId);
 		this.dayBookRepository.delete(dayBookId);

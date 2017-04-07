@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.AccountType;
 
 /**
  * 
@@ -19,6 +20,7 @@ public interface AccountService {
 	
 	Page<Account> getPageOfAccount(String search,Pageable pageable);
 	List<Account> getAllAccount(Sort sort);
+	List<Account> getAllAccount(AccountType accountType,Sort sort);
 	Account getAccountById(Long accountId);
 	Account createOrUpdateAccount(Account account);
 	void removeAccountById(Long accountId);

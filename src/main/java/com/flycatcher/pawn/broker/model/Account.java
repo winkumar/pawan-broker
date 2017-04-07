@@ -82,6 +82,12 @@ public class Account implements Serializable {
 	@JoinColumn(name="modified_by")
 	@JsonIgnore
 	private UserInfo modifiedBy;
+	
+	//bi-directional many-to-one association to AccountType
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="account_type")
+	@JsonIgnore
+	private AccountType accountType;
 
 	//bi-directional many-to-one association to DayBook
 	@OneToMany(mappedBy="account",fetch=FetchType.LAZY)
