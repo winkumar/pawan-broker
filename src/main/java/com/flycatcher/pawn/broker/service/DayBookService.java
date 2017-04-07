@@ -1,6 +1,8 @@
 package com.flycatcher.pawn.broker.service;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ public interface DayBookService {
 	
 	Page<DayBook> getPageOfDayBook(String search,Pageable pageable);
 	List<DayBook> getAllDayBook(Sort sort);
+	List<DayBook> getJournal(Sort sort,Set<Account> accounts,Timestamp startDate,Timestamp endDate);
 	DayBook getDayBookById(Long dayBookId);
 	DayBook createOrUpdateDayBook(DayBook dayBook);
 	void removeDayBookById(Long dayBookId);

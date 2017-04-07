@@ -68,6 +68,7 @@ public abstract class AbstractRestHandler{
     }
     
     
+    
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ResourceAlreadyExistException.class)
     public    @ResponseBody
@@ -247,7 +248,7 @@ public abstract class AbstractRestHandler{
     	  return new RestErrorInfo("Access denied ...!", "Full authentication need to access this resource");
       }
         
-        return new RestErrorInfo("Somthing went wrong","It is not valid request");
+        return new RestErrorInfo(ex.getLocalizedMessage(),"It is not valid request");
     }
     
        

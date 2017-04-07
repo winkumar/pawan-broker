@@ -1,6 +1,8 @@
 package com.flycatcher.pawn.broker.repo;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,12 @@ public interface DayBookRepository extends JpaRepository<DayBook, Long> {
 	Page<DayBook> findDayBookByPage(String search,Pageable pageable);
 	
 	List<DayBook> findByAccount(Account account,Sort sort);
+	
+	
+	@Query("SELECT d FROM DayBook d WHERE (d.transactionDate BETWEEN ?2 AND ?3) AND d.account IN ?1")
+	List<DayBook> findByAccount(Set<Account> accounts,Timestamp startDate,Timestamp endDate,Sort sort);
+	
+	
 }
 
 

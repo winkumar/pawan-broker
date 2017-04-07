@@ -104,6 +104,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	    		dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
 	    		dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
 	    		dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
+	    		dayBookInfo.setAccountTypeId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountType().getId():null);
 	    		dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
 	    		dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
 	    		dayBookInfo.setDayBookId(dayBook.getDayBookId());
@@ -167,6 +168,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	    		dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
 	    		dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
 	    		dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
+	    		dayBookInfo.setAccountTypeId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountType().getId():null);
 	    		dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
 	    		dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
 	    		dayBookInfo.setDayBookId(dayBook.getDayBookId());
@@ -211,6 +213,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	    dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
 	    dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
 	    dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
+	    dayBookInfo.setAccountTypeId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountType().getId():null);
 	    dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
 	    dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
 	    dayBookInfo.setDayBookId(dayBook.getDayBookId());
@@ -390,7 +393,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
 	@PreAuthorize("hasAnyRole('ADMIN')")
     public    @ResponseBody
-    ResponseEntity<?> updateDayBook(@ApiParam(value = "The dayabook Id", required = true)
+    ResponseEntity<?> deleteDayBook(@ApiParam(value = "The dayabook Id", required = true)
 									@PathVariable("dayBookId") Long dayBookId,
     								HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- delete daybook rest controller invoked , daybookId -> {} ---",dayBookId);
