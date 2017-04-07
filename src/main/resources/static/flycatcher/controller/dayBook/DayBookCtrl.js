@@ -70,7 +70,7 @@
 	   
 	   $scope.concatName = function(v1,v2){
 		   if(v1 !== null && v2 !== null){
-			   return (v1+"-"+v2);
+			   return (v1 +"-"+v2);
 		   }
 	   }
 	   
