@@ -22,6 +22,7 @@
 									class="form-control" 
 									name="date"
 									id="date" 
+									ng-model="daybook.transactionDate"
 									required 
 									ng-class="{errors: isValidate(myform,myform.date)}"/>
 								</div>
@@ -32,13 +33,9 @@
 	 							<select class="form-control" name="accountType" 
 	 							id="accountType" ng-model="daybook.accountType"
 	 							required
-	 							ng-class="{errors: isValidate(myform,myform.accountType)}">
-		      						<!-- <option 
-		      						ng-repeat="option in daybook.accountTypes" 
-		      						value="{{option.id}}">
-		      						{{option.name}}
-		      						</option> -->
-		      						<option value="0">Select...</option>
+	 							ng-class="{errors: isValidate(myform,myform.accountType)}"
+	 							ng-options="account.id as account.accountType for account in accountTypeList"
+	 							ng-change="loadAccounts(daybook.accountType);">
 	   						  	</select>
 	   						   </div>
    							 </div>
@@ -47,10 +44,11 @@
 								<div class="col-sm-8">
 									<select class="form-control" 
 									name="accountName" id="accountName" 
-									ng-model="daybook.accountName"
-									ng-class="{errors: isValidate(myform,myform.account)}"
-									required>
-									<option value="0">Select....</option>
+									ng-model="daybook.accountId"
+									ng-class="{errors: isValidate(myform,myform.accountName)}"
+									required
+									ng-disabled='daybook.accountType ==null'
+									ng-options="acc.accountId as concatName(acc.firstName,acc.accountNumber) for acc in accountList">
 									</select>
 								</div>
 							</div>
@@ -65,17 +63,6 @@
 									id="amount" 
 									required
 									ng-class="{errors: isValidate(myform,myform.amount)}"/>
-								</div>
-								<label class="col-sm-1 label_right">PS</label>
-								<div class="col-sm-3">
-									<input 
-									type="text" 
-									class="form-control" 
-									name="paise"
-									ng-model="daybook.paise" 
-									id="paise" 
-									required 
-									ng-class="{errors: isValidate(myform,myform.paise)}"/>
 								</div>
 							</div>
 							<div class="form-group">
@@ -110,7 +97,7 @@
 									class="form-control" 
 									id="description"
 									name="description" 
-									ng-model="daybook.description" 
+									ng-model="daybook.transactionDesc" 
 									rows="2"
 									cols="20"
 									ng-class="{errors: isValidate(myform,myform.description)}">
@@ -123,7 +110,7 @@
 								type="button" 
 								class="btn btn-primary"
 								ng-disabled='myform.$invalid'
-								ng-click="addAccount(daybook)">
+								ng-click="saveOrUpdateDaybook(myform,daybook)">
 								Save
 								</button>
 							</div>
@@ -160,10 +147,10 @@
 							<tbody>
 								<tr ng-repeat="daybook in dayBookList | filter : searchText | limitTo : 5">
 									<td align="center">
-										<a class="btn btn-default" ng-click="editDayBook(daybook)"><em class="fa fa-pencil"></em></a> 
-										<a class="btn btn-danger" ng-click="deleteAccount(daybook)"><em class="fa fa-trash"></em></a>
+										<a class="btn btn-default" ng-click="editBook(daybook)"><em class="fa fa-pencil"></em></a> 
+										<a class="btn btn-danger" ng-click="deleteBook(daybook)"><em class="fa fa-trash"></em></a>
 									</td>
-									<td ng-bind="daybook.transactionDate"></td>
+									<td ng-bind="daybook.transactionDate | date :'dd-MMM-yyyy'"></td>
 									<td ng-bind="daybook.accountName"></td>
 									<td ng-bind="daybook.accountNumber"></td>
 									<td ng-bind="daybook.transactionType=='CREDIT' ? daybook.transactionAmount : ''"></td>

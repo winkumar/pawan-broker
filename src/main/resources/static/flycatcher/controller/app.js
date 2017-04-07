@@ -81,3 +81,4 @@ myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', f
 //myApp.config(['$httpProvider', function($httpProvider) {
 //	  $httpProvider.interceptors.push('authInterceptor');
 //}]);
+ 

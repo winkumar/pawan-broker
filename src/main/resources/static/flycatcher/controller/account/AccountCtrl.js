@@ -12,6 +12,7 @@
   	    	    url: url,
   	    	}).success(function(data, status, headers, config){
   	    		$scope.accountDetails = data;
+  	    		$scope.accountTypes();
   	    	}).error(function(data, status, headers, config){
   	    	});
          };
@@ -78,5 +79,16 @@
         	return false;
         };
         
+        $scope.accountTypes = function(){
+ 		   $http({
+ 	    	    method: 'GET',
+ 	    	    url: '/api/v1/accountTypes?sort=ASC',
+ 	    	    headers: {'Content-Type': 'application/json'}
+ 	    	}).success(function(data, status, headers, config){
+ 	    		$scope.accountTypeList = data;
+ 	    	}).error(function(data, status, headers, config){
+ 	    		$scope.errormessage = data.message;
+ 	    	});
+ 	   }
     });
 } ());
