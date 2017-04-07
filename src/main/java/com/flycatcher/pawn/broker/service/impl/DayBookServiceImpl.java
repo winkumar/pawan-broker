@@ -1,6 +1,8 @@
 package com.flycatcher.pawn.broker.service.impl;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -78,6 +80,13 @@ public class DayBookServiceImpl implements DayBookService {
 	public List<DayBook> getAllDayBookByAccount(Account account, Sort sort) {
 		LOGGER.debug("--- get daybook by account -> {} , sort -> {} ---",account,sort);
 		return this.dayBookRepository.findByAccount(account, sort);
+	}
+
+	@Override
+	public List<DayBook> getJournal(Sort sort, Set<Account> accounts,
+			Timestamp startDate, Timestamp endDate) {
+		LOGGER.debug("--- get joournal page by sort -> {} , accounts -> {} ,startDate -> {} , endDate -> {} ---",sort,accounts,startDate,endDate);
+		return this.dayBookRepository.findByAccount(accounts, startDate, endDate, sort);
 	}
 
 }
