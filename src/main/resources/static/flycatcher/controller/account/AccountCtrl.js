@@ -1,12 +1,11 @@
 'use strict';
 (function () {
-    angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location,$rootScope,$cookieStore,api) {
+    angular.module('myApp.account').controller('AccountCtrl', function ($scope, $http, $attrs, $location,$localStorage,$rootScope,api) {
     	$scope.accountDetails = null;
     	$scope.account = null;
     	$scope.editMode = false;
     	
     	$scope.init = function(){
-    	   api.init($cookieStore.get('token'));
     	   var url = "/api/v1/accounts?page=0&size=4&sort=ASC";
       	   $http({
   	    	    method: 'GET',

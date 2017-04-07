@@ -8,9 +8,7 @@ angular.module('myApp.journal',[]);
 var denpency = [
 				'ngRoute',
 				'ngIdle',
-				'ngCookies',
-				'ngResource',
-				'ngSanitize',
+				'ngStorage',
 				'myApp.account',
 				'myApp.login',
 				'myApp.dayBook',
@@ -34,24 +32,24 @@ myApp.config(function(IdleProvider, KeepaliveProvider) {
 	 KeepaliveProvider.interval(10);
 });
 
-myApp.run(function(Idle,api,$rootScope,$window) {
+myApp.run(function(Idle,api,$q,$rootScope,$window,$localStorage) {
 	  api.init();
 	  Idle.watch();
 	  $rootScope.$on('IdleTimeout', function(){
-		  $window.location.href ="/";
+		  //$window.location.href ="/";
 	  });
 });
 
-myApp.factory('api', function($http, $cookieStore) {
+myApp.factory('api', function($http,$localStorage) {
 	return {
 		init : function(token) {
-			$http.defaults.headers.common['X-Access-Token'] = token || $cookieStore.get('token');
+			$http.defaults.headers.common['X-Access-Token'] = token || $localStorage.token;
 		}
 	};
 });
 
 
-myApp.factory('authInterceptor', ['$rootScope', '$q', '$cookies', '$location', '$timeout', function ($rootScope, $q, $cookies, $location, $timeout) {
+myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', function ($rootScope, $q, $location, $timeout) {
 	return {
 	    request: function (config) {
 	      delete $rootScope.errorKey;

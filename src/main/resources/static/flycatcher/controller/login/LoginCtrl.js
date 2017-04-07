@@ -1,5 +1,5 @@
 (function() {
-    angular.module('myApp.login').controller('LoginCtrl', function($scope, $http, $attrs, $location,$rootScope,$cookieStore,api) {
+    angular.module('myApp.login').controller('LoginCtrl', function($scope, $http, $attrs, $location,$rootScope,$localStorage,api) {
         $scope.login = function(){
         	
     	    	$scope.dataToPost = {
@@ -14,7 +14,7 @@
     	    	}).success(function(data, status, headers, config){
     	    		var token = data.accessToken;
     	            api.init(token);
-    	            $cookieStore.put('token', token);
+    	            $localStorage.token = token;
     	            $location.path('/account');
     	    	}).error(function(data, status, headers, config){
     	    		$scope.errormessage = data.message;
