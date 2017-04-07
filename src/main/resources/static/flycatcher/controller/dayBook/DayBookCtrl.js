@@ -1,6 +1,6 @@
 'use strict';
 (function() {
-	angular.module('myApp.account').controller('DayBookCtrl', function($scope, $http, $attrs, $location,$filter) {
+	angular.module('myApp.account').controller('DayBookCtrl', function($scope, $http, $attrs, $location) {
 		$scope.dayBookList = null;
 		$scope.ediMode = false;
 		$scope.accountList = null;
