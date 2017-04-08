@@ -77,7 +77,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	@RequestMapping(value = "",
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    @ApiOperation(value = "Get Page current account.", notes = "It will provide page of account.")
+    @ApiOperation(value = "Get page current daybook.", notes = "It will provide page of daybook.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody

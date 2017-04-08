@@ -194,7 +194,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 				
 		Map<String,Object> balanceSheet=new ConcurrentHashMap<String, Object>();
 		balanceSheet.put("balanceSheet", balanceSheetInfos);
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		balanceSheet.put("startDate", df.format(startDate));
 		balanceSheet.put("endDate", df.format(endDate));
 		balanceSheet.put("totalDebit", debitAmount);
