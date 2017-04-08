@@ -321,9 +321,10 @@ public class AccountRestController extends AbstractRestHandler {
 		account.setLastName(accountInfo.getLastName());
 		account.setFatherName(accountInfo.getFatherName());
 		account.setCurrentAddress(accountInfo.getCurrentAddress());
+		account.setPresentAddress(accountInfo.getPresentAddress());
 		account.setPinCode(accountInfo.getPinCode());
 		account.setArea(accountInfo.getArea());
-		account.setCity(account.getCity());
+		account.setCity(accountInfo.getCity());
 		account.setState(accountInfo.getState());
 		account.setCreatedDate(new Date());
 		account.setCreatedBy(createdBy);
@@ -411,9 +412,10 @@ public class AccountRestController extends AbstractRestHandler {
 		account.setLastName(accountInfo.getLastName());
 		account.setFatherName(accountInfo.getFatherName());
 		account.setCurrentAddress(accountInfo.getCurrentAddress());
+		account.setPresentAddress(accountInfo.getPresentAddress());
 		account.setPinCode(accountInfo.getPinCode());
 		account.setArea(accountInfo.getArea());
-		account.setCity(account.getCity());
+		account.setCity(accountInfo.getCity());
 		account.setState(accountInfo.getState());
 		account.setAccountType(accountType);
 		//account.setCreatedDate(new Date());

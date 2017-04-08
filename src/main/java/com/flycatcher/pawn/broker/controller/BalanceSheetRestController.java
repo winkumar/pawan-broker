@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import com.flycatcher.pawn.broker.model.Account;
 import com.flycatcher.pawn.broker.model.AccountType;
 import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.model.TransactionType;
-import com.flycatcher.pawn.broker.pojo.DayBookInfo;
+import com.flycatcher.pawn.broker.pojo.BalanceSheetInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
 import com.flycatcher.pawn.broker.service.AccountTypeService;
 import com.flycatcher.pawn.broker.service.DayBookService;
@@ -79,14 +80,14 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
-    ResponseEntity<?> getAllDayBook(@ApiParam(value = "The balance sheet sort by transaction date", required = true)
+    ResponseEntity<?> getBalanceSheet(@ApiParam(value = "The balance sheet sort by transaction date", required = true)
     								@RequestParam(value = "sort", required = true, defaultValue = DEFAULT_PAGE_SORT) Sort.Direction sortDirection ,
     								@ApiParam(value = "The balance sheet transaction start date", required = false)
     								@RequestParam(value = "startDate", required = false) String startDateString ,
     								@ApiParam(value = "The balance sheet transaction end date", required = false)
     								@RequestParam(value = "endDate", required = false) String endDateString,
-    								@ApiParam(value = "The account type", required = true)
-    								@RequestParam(value = "accountType", required = true) Long accountTypeId,
+    								@ApiParam(value = "The account type", required = false)
+    								@RequestParam(value = "accountType", required = false , defaultValue="-1") Long accountTypeId,
     								@ApiParam(value = "The account", required = false)
     								@RequestParam(value = "account", required = false) Long accountId,
 									HttpServletRequest request, HttpServletResponse response) {
@@ -109,11 +110,11 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 		
 		if(endDateString==null){
 			LOGGER.debug("--- end date is null so end date become current date ---");
-			endDate=new Date();
+			endDate=startDate;
 		}else{
 		    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		    try {
-		    	endDate = sdf.parse(startDateString);
+		    	endDate = sdf.parse(endDateString);
 			} catch (ParseException e) {
 				LOGGER.debug("--- date parse exception ---");
 				throw new DataFormatException("start date parse doesn't exist's ...!");
@@ -125,73 +126,132 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 			throw new DataFormatException("start date not less than end date ...!");
 		}
 		
-		if(accountTypeId==null){
-			LOGGER.error("--- account type id is null ---");
-			throw new DataFormatException("account type doesn't exist's ...!");
-		}
-		AccountType accountType=this.accountTypeService.getAccountType(accountTypeId);
-		if(accountType==null){
-			LOGGER.error("--- account type doesn't exist's , account type -> {} ---",accountTypeId);
-			throw new ResourceNotFoundException("account type doesn't exist's ...!");
-		}
+		List<BalanceSheetInfo> balanceSheetInfos=new ArrayList<BalanceSheetInfo>();
 		
 		
-		Set<Account> accounts=new HashSet<Account>();
-		if(accountId!=null){
-			Account account=this.accountService.getAccountById(accountId);
-			if(account==null){
-				LOGGER.error("--- account does not exist's , accountId -> {} ---",accountId);
-				throw new ResourceNotFoundException("account doesn't exist's ...!");
+		if(accountTypeId==-1 || accountTypeId==null){
+			Sort sort=new Sort(sortDirection,"priority");
+			List<AccountType> accountTypes=this.accountTypeService.getAllAccountType(sort);
+			for(AccountType accountType:accountTypes){
+				Set<Account> accounts=accountType.getAccounts();
+				if(accounts==null || accounts.isEmpty() ){
+					/*BalanceSheetInfo balanceSheetInfo=new BalanceSheetInfo();
+					balanceSheetInfo.setAccountType(accountType.getAccountType());
+					balanceSheetInfo.setBalance(0.0);
+					balanceSheetInfo.setIsPositive(true);
+					
+					balanceSheetInfos.add(balanceSheetInfo);*/
+					
+					continue;
+					
+				}else{
+					balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate));
+				}
+				
 			}
-			accounts.add(account);
+			
+			
 		}else{
-			accounts=accountType.getAccounts();
+			AccountType accountType=this.accountTypeService.getAccountType(accountTypeId);
+			if(accountType==null){
+				LOGGER.error("--- account type doesn't exist's , account type -> {} ---",accountTypeId);
+				throw new ResourceNotFoundException("account type doesn't exist's ...!");
+			}
+						
+			Set<Account> accounts=new HashSet<Account>();
+			if(accountId!=null){
+				Account account=this.accountService.getAccountById(accountId);
+				/*if(account==null){
+					LOGGER.error("--- account does not exist's , accountId -> {} ---",accountId);
+					throw new ResourceNotFoundException("account doesn't exist's ...!");
+				}*/
+				accounts.add(account);
+			}else{
+				accounts=accountType.getAccounts();
+			}
+			
+			if(accounts==null || accounts.isEmpty()){
+				/*BalanceSheetInfo balanceSheetInfo=new BalanceSheetInfo();
+				balanceSheetInfo.setAccountType(accountType.getAccountType());
+				balanceSheetInfo.setBalance(0.0);
+				balanceSheetInfo.setIsPositive(true);
+				
+				balanceSheetInfos.add(balanceSheetInfo);*/
+			}else{
+				balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate));
+			}
 		}
-		
-		if(accounts.isEmpty()){
-			LOGGER.error("--- no more accounts exist's ---");
-			throw new ResourceNotFoundException("no more accounts exist's this account type ...!");
+		Double debitAmount=0.0,creditAmount=0.0;
+		if(balanceSheetInfos!=null){
+			for(BalanceSheetInfo balanceSheetInfo:balanceSheetInfos){
+				if(balanceSheetInfo.getIsPositive()){
+					creditAmount+=balanceSheetInfo.getBalance();
+				}else{					
+					debitAmount+=balanceSheetInfo.getBalance();
+				}
+			}
 		}
+				
+		Map<String,Object> balanceSheet=new ConcurrentHashMap<String, Object>();
+		balanceSheet.put("balanceSheet", balanceSheetInfos);
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		balanceSheet.put("startDate", df.format(startDate));
+		balanceSheet.put("endDate", df.format(endDate));
+		balanceSheet.put("totalDebit", debitAmount);
+		balanceSheet.put("totalCredit", creditAmount);
 		
+		LOGGER.info("--- balancesheet info return successfully ---");
+		return new ResponseEntity<>(balanceSheet,HttpStatus.OK);
+	}
+
+
+	/**
+	 * 
+	 * @param sortDirection
+	 * @param accountType
+	 * @param accounts
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	private BalanceSheetInfo balanceSheet(final Sort.Direction sortDirection,final AccountType accountType,final Set<Account> accounts,final Date startDate,final Date endDate){
+				
 		Sort sort=new Sort(sortDirection,"transactionDate");
 		List<DayBook> dayBooks=this.dayBookService.getJournal(sort, accounts, new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()));
-		
-		
+				
 		Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
-		List<DayBookInfo> transactions=new ArrayList<DayBookInfo>();
 		if(dayBooks!=null){
 			for(DayBook dayBook: dayBooks) {
-				
+					
 				if(TransactionType.CREDIT.equals(dayBook.getTransactionType())){
 					creditAmount+=dayBook.getTransactionAmount()!=null?dayBook.getTransactionAmount():0.0;
 				}else{
 					debitAmount+=dayBook.getTransactionAmount()!=null?dayBook.getTransactionAmount():0.0;
 				}
-				
-				
 			}
 		}
 		
 		
-		Map<String, Object> journals=new ConcurrentHashMap<String, Object>();
 		
-		journals.put("transactions", transactions);
-		journals.put("credit", creditAmount);
-		journals.put("debit", debitAmount);
-		
-		balance=debitAmount-creditAmount;
+		balance=creditAmount-debitAmount;
+		Boolean isPositive=false;
 		if(balance<=0)
-			journals.put("isPositive", false);
+			isPositive=false;
 		else
-			journals.put("isPositive", true);
+			isPositive=true;
+				
 		
-		journals.put("balance", Math.abs(balance));
+		BalanceSheetInfo balanceSheetInfo=new BalanceSheetInfo();
 		
-		LOGGER.info("--- daybook list return successfully ---");
-		return new ResponseEntity<>(dayBooks,HttpStatus.OK);
+		balanceSheetInfo.setAccountType(accountType.getAccountType());
+		balanceSheetInfo.setBalance(Math.abs(balance));
+		balanceSheetInfo.setIsPositive(isPositive);
+		
+		return balanceSheetInfo;
 	}
 
-
+	
+	
 }
 
 

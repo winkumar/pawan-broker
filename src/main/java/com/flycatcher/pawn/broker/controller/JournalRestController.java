@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +87,8 @@ public class JournalRestController extends AbstractRestHandler{
     								@RequestParam(value = "startDate", required = false) String startDateString ,
     								@ApiParam(value = "The journal transaction end date", required = false)
     								@RequestParam(value = "endDate", required = false) String endDateString,
-    								@ApiParam(value = "The account type", required = true)
-    								@RequestParam(value = "accountType", required = true) Long accountTypeId,
+    								@ApiParam(value = "The account type", required = false)
+    								@RequestParam(value = "accountType", required = false, defaultValue="-1") Long accountTypeId,
     								@ApiParam(value = "The account", required = false)
     								@RequestParam(value = "account", required = false) Long accountId,
 									HttpServletRequest request, HttpServletResponse response) {
@@ -109,11 +111,11 @@ public class JournalRestController extends AbstractRestHandler{
 		
 		if(endDateString==null){
 			LOGGER.debug("--- end date is null so end date become current date ---");
-			endDate=new Date();
+			endDate=startDate;
 		}else{
 		    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		    try {
-		    	endDate = sdf.parse(startDateString);
+		    	endDate = sdf.parse(endDateString);
 			} catch (ParseException e) {
 				LOGGER.debug("--- date parse exception ---");
 				throw new DataFormatException("start date parse doesn't exist's ...!");
@@ -125,33 +127,63 @@ public class JournalRestController extends AbstractRestHandler{
 			throw new DataFormatException("start date not less than end date ...!");
 		}
 		
-		if(accountTypeId==null){
-			LOGGER.error("--- account type id is null ---");
-			throw new DataFormatException("account type doesn't exist's ...!");
-		}
-		AccountType accountType=this.accountTypeService.getAccountType(accountTypeId);
-		if(accountType==null){
-			LOGGER.error("--- account type doesn't exist's , account type -> {} ---",accountTypeId);
-			throw new ResourceNotFoundException("account type doesn't exist's ...!");
-		}
+		Map<String, Object> journals=new HashMap<String, Object>();
 		
-		
-		Set<Account> accounts=new HashSet<Account>();
-		if(accountId!=null){
-			Account account=this.accountService.getAccountById(accountId);
-			if(account==null){
-				LOGGER.error("--- account does not exist's , accountId -> {} ---",accountId);
-				throw new ResourceNotFoundException("account doesn't exist's ...!");
+		if(accountTypeId==-1 || accountTypeId==null){
+			Sort sort=new Sort(sortDirection,"priority");
+			List<AccountType> accountTypes=this.accountTypeService.getAllAccountType(sort);
+			for(AccountType accountType:accountTypes){
+				Set<Account> accounts=accountType.getAccounts();
+				if(accounts==null || accounts.isEmpty() ){
+					journals.put(accountType.getAccountTypeApi(), new HashMap<String, Object>());
+				}else{
+					journals.put(accountType.getAccountTypeApi(), journal(sortDirection,accountType,accounts,startDate,endDate));
+				}
+				
 			}
-			accounts.add(account);
+			
+			
 		}else{
-			accounts=accountType.getAccounts();
+			AccountType accountType=this.accountTypeService.getAccountType(accountTypeId);
+			if(accountType==null){
+				LOGGER.error("--- account type doesn't exist's , account type -> {} ---",accountTypeId);
+				throw new ResourceNotFoundException("account type doesn't exist's ...!");
+			}
+						
+			Set<Account> accounts=new HashSet<Account>();
+			if(accountId!=null){
+				Account account=this.accountService.getAccountById(accountId);
+				/*if(account==null){
+					LOGGER.error("--- account does not exist's , accountId -> {} ---",accountId);
+					throw new ResourceNotFoundException("account doesn't exist's ...!");
+				}*/
+				accounts.add(account);
+			}else{
+				accounts=accountType.getAccounts();
+			}
+			
+			if(accounts==null || accounts.isEmpty()){
+				journals.put(accountType.getAccountTypeApi(), new HashMap<String, Object>());
+			}else{
+				journals.put(accountType.getAccountTypeApi(), journal(sortDirection,accountType,accounts,startDate,endDate));
+			}
 		}
 		
-		if(accounts.isEmpty()){
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		journals.put("startDate", df.format(startDate));
+		journals.put("endDate",  df.format(endDate));
+		
+		LOGGER.info("--- daybook list return successfully ---");
+		return new ResponseEntity<>(journals,HttpStatus.OK);
+	}
+	
+	
+	private Map<String,Object> journal(final Sort.Direction sortDirection,final AccountType accountType,final Set<Account> accounts,final Date startDate,final Date endDate){
+				
+		/*if(accounts.isEmpty()){
 			LOGGER.error("--- no more accounts exist's ---");
 			throw new ResourceNotFoundException("no more accounts exist's this account type ...!");
-		}
+		}*/
 		
 		Sort sort=new Sort(sortDirection,"transactionDate");
 		List<DayBook> dayBooks=this.dayBookService.getJournal(sort, accounts, new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()));
@@ -190,22 +222,23 @@ public class JournalRestController extends AbstractRestHandler{
 		}
 		
 		
-		Map<String, Object> journals=new ConcurrentHashMap<String, Object>();
+		Map<String, Object> journalAccount=new ConcurrentHashMap<String, Object>();
 		
-		journals.put("transactions", transactions);
-		journals.put("credit", creditAmount);
-		journals.put("debit", debitAmount);
+		journalAccount.put("transactions", transactions);
+		journalAccount.put("credit", creditAmount);
+		journalAccount.put("debit", debitAmount);
+		journalAccount.put("accountType", accountType.getAccountType());
 		
-		balance=debitAmount-creditAmount;
+		balance=creditAmount-debitAmount;
 		if(balance<=0)
-			journals.put("isPositive", false);
+			journalAccount.put("isPositive", false);
 		else
-			journals.put("isPositive", true);
+			journalAccount.put("isPositive", true);
 		
-		journals.put("balance", Math.abs(balance));
+		journalAccount.put("balance", Math.abs(balance));
 		
-		LOGGER.info("--- daybook list return successfully ---");
-		return new ResponseEntity<>(dayBooks,HttpStatus.OK);
+		
+		return journalAccount;
 	}
 }
 

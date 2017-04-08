@@ -32,9 +32,8 @@ public interface DayBookRepository extends JpaRepository<DayBook, Long> {
 	
 	List<DayBook> findByAccount(Account account,Sort sort);
 	
-	
-	@Query("SELECT d FROM DayBook d WHERE (d.transactionDate BETWEEN ?2 AND ?3) AND d.account IN ?1")
-	List<DayBook> findByAccount(Set<Account> accounts,Timestamp startDate,Timestamp endDate,Sort sort);
+	@Query("SELECT d FROM DayBook d WHERE (d.transactionDate BETWEEN ?1 AND ?2) AND (d.account IN (?3))")
+	List<DayBook> findByAccount(Timestamp startDate,Timestamp endDate,Set<Account> accounts,Sort sort);
 	
 	
 }

@@ -83,10 +83,10 @@ public class DayBookServiceImpl implements DayBookService {
 	}
 
 	@Override
-	public List<DayBook> getJournal(Sort sort, Set<Account> accounts,
+	public List<DayBook> getJournal(Sort sort,Set<Account> accounts,
 			Timestamp startDate, Timestamp endDate) {
 		LOGGER.debug("--- get joournal page by sort -> {} , accounts -> {} ,startDate -> {} , endDate -> {} ---",sort,accounts,startDate,endDate);
-		return this.dayBookRepository.findByAccount(accounts, startDate, endDate, sort);
+		return this.dayBookRepository.findByAccount( startDate, endDate,accounts, sort);
 	}
 
 }
