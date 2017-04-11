@@ -6,7 +6,7 @@
     	$scope.editMode = false;
     	
     	$scope.init = function(){
-    	   var url = "/api/v1/accounts?page=0&size=4&sort=ASC";
+    	   var url = "/api/v1/accounts?page=0&size=10&sort=ASC";
       	   $http({
   	    	    method: 'GET',
   	    	    url: url,

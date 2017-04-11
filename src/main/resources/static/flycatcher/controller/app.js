@@ -4,6 +4,7 @@ angular.module('myApp.account',['ngMessages']);
 angular.module('myApp.login',[]);
 angular.module('myApp.dayBook',[]);
 angular.module('myApp.journal',[]);
+angular.module('myApp.balanceSheet',[]);
 
 var denpency = [
 				'ngRoute',
@@ -12,7 +13,8 @@ var denpency = [
 				'myApp.account',
 				'myApp.login',
 				'myApp.dayBook',
-				'myApp.journal'
+				'myApp.journal',
+				'myApp.balanceSheet'
 				];
 
 var myApp = angular.module('myApp',denpency);
@@ -23,6 +25,7 @@ myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
     .when('/account', {templateUrl: '/flycatcher/screen/account/account.create.html'})
     .when('/daybook', {templateUrl: '/flycatcher/screen/dayBook/daybook.entry.html'})
     .when('/journalView', {templateUrl: '/flycatcher/screen/journal/journal.view.html'})
+    .when('/balanceSheetView', {templateUrl: '/flycatcher/screen/balanceSheet/balance.sheet.html'})
     .otherwise({redirectTo: '/'})
 });
 

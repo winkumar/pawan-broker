@@ -4,7 +4,10 @@
 		$scope.dayBookList = null;
 		$scope.ediMode = false;
 		$scope.accountList = null;
-		$scope.daybook = null;
+		$scope.daybook = {
+		   transactionDate : new Date()
+		}
+		
 		$scope.init =function(){
 			$http({
 	    	    method: 'GET',

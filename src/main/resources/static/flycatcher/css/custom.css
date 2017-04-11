@@ -290,3 +290,7 @@ table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th,
 .errorText{
   color :red;
 }
+
+.redcolor{
+	background-color:red;
+}

@@ -1,0 +1,61 @@
+<div id="wrapper">
+	<div id="page-wrapper">
+		<div ng-include="'nav.html'"></div>
+		<div ng-controller="BalanceSheetCtrl" class='row'>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Balance Sheet</h3>
+				</div>
+				<div class="panel-body">
+					<form name="myform" id="myform"
+						class="form-horizontal fv-form fv-form-bootstrap" ng-init="init()">
+						<div class="form-group">
+							<label class="col-sm-1 label_right">From</label>
+							<div class="col-sm-3">
+								<input type="date" class="form-control" name="startDate"
+									id="startDate" ng-model="balanceSheetSearch.startDate" required
+									ng-class="{errors: isValidate(myform,myform.startDate)}" />
+							</div>
+							<label class="col-sm-1 label_right">To</label>
+							<div class="col-sm-3">
+								<input type="date" class="form-control" name="endDate"
+									id="endDate" ng-model="balanceSheetSearch.endDate" required
+									ng-class="{errors: isValidate(myform,myform.endDate)}" />
+							</div>
+						</div>
+						<div class="form-group ">
+							<span class="col-sm-10"></span>
+							<button type="button" class="btn btn-primary"
+								ng-disabled='myform.$invalid'
+								ng-click="search(balanceSheetSearch)">Search</button>
+						</div>
+						<div>
+							<table class="table table-striped table-bordered" style="font-size:13px;">
+								<thead>
+									<tr>
+										<th>Account Type</th>
+										<th>Credit</th>
+										<th>Debit</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="balance in balanceSheetList.balanceSheet ">
+										<td ng-bind='balance.accountType'></td>
+										<td ng-bind='balance.isPositive ? balance.balance: 0 '></td>
+										<td ng-bind='!balance.isPositive ? balance.balance:0'></td>
+									</tr>
+									<tr>
+									  <td class='label_right'>Total</td>
+									  <td ng-bind='balanceSheetList.totalCredit'></td>
+									  <td ng-bind='balanceSheetList.totalDebit'></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
