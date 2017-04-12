@@ -2,182 +2,198 @@
 	<div id="page-wrapper">
 		<div ng-include="'nav.html'"></div>
 		<div ng-controller="DayBookCtrl" class="row">
-			<div class="col-sm-5">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Day Book</h3>
-					</div>
-					<div class="panel-body">
-						<form 
-						class="form-horizontal fv-form fv-form-bootstrap" 
-						id="myform" 
-						name="myform"
-						ng-init = "init()" 
-						novalidate>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Date</label>
-								<div class="col-sm-8">
-									<input 
-									type="date" 
-									class="form-control" 
-									name="date"
-									id="date" 
-									ng-model="daybook.transactionDate"
-									required 
-									ng-class="{errors: isValidate(myform,myform.date)}"/>
+			<div ng-show='!dayBookView'>
+				<div class="col-sm-5">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Day Book</h3>
+						</div>
+						<div class="panel-body">
+							<form class="form-horizontal fv-form fv-form-bootstrap"
+								id="myform" name="myform" ng-init="init()" novalidate>
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Date</label>
+									<div class="col-sm-8">
+										<input type="date" class="form-control" name="date" id="date"
+											ng-model="daybook.transactionDate" required
+											ng-class="{errors: isValidate(myform,myform.date)}" />
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Account Type</label>
-								<div class="col-sm-8">
-	 							<select class="form-control" name="accountType" 
-	 							id="accountType" ng-model="daybook.accountType"
-	 							required
-	 							ng-class="{errors: isValidate(myform,myform.accountType)}"
-	 							ng-options="account.id as account.accountType for account in accountTypeList"
-	 							ng-change="loadAccounts(daybook.accountType);">
-	   						  	</select>
-	   						   </div>
-   							 </div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Account</label>
-								<div class="col-sm-8">
-									<select class="form-control" 
-									name="accountName" id="accountName" 
-									ng-model="daybook.accountId"
-									ng-class="{errors: isValidate(myform,myform.accountName)}"
-									required
-									ng-disabled='daybook.accountType ==null'
-									ng-options="acc.accountId as concatName(acc.firstName,acc.accountNumber) for acc in accountList">
-									</select>
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Account Type</label>
+									<div class="col-sm-8">
+										<select class="form-control" name="accountType"
+											id="accountType" ng-model="daybook.accountType" required
+											ng-class="{errors: isValidate(myform,myform.accountType)}"
+											ng-options="account.id as account.accountType for account in accountTypeList"
+											ng-change="loadAccounts(daybook.accountType);">
+										</select>
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Amount</label>
-								<div class="col-sm-4">
-									<input
-									type="text" 
-									class="form-control" 
-									name="amount"
-									ng-model="daybook.transactionAmount" 
-									id="amount" 
-									required
-									ng-class="{errors: isValidate(myform,myform.amount)}"/>
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Account</label>
+									<div class="col-sm-8">
+										<select class="form-control" name="accountName"
+											id="accountName" ng-model="daybook.accountId"
+											ng-class="{errors: isValidate(myform,myform.accountName)}"
+											required ng-disabled='daybook.accountType ==null'
+											ng-options="acc.accountId as concatName(acc.firstName,acc.accountNumber) for acc in accountList">
+										</select>
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Type</label>
-								<div class="col-sm-8">
-									<label class="col-sm-4 label_right"> 
-									<input
-									type="radio" 
-									name="type" 
-									ng-model="daybook.transactionType"
-									id="creditType" 
-									required 
-									value="CREDIT"
-									ng-class="{errors: isValidate(myform,myform.type)}"/>Credit
-									</label> 
-									<label class="col-sm-4 label_right"> 
-									<input
-									type="radio" 
-									name="type" 
-									ng-model="daybook.transactionType"
-									id="debitType" 
-									required 
-									value="DEBIT"
-									ng-class="{errors: isValidate(myform,myform.type)}"/>Debit
-									</label>
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Amount</label>
+									<div class="col-sm-4">
+										<input type="text" class="form-control" name="amount"
+											ng-model="daybook.transactionAmount" id="amount" required
+											ng-class="{errors: isValidate(myform,myform.amount)}" />
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 label_right">Notes : </label>
-								<div class="col-sm-8 label_right">
-									<textarea 
-									class="form-control" 
-									id="description"
-									name="description" 
-									ng-model="daybook.transactionDesc" 
-									rows="2"
-									cols="20"
-									ng-class="{errors: isValidate(myform,myform.description)}">
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Type</label>
+									<div class="col-sm-8">
+										<label class="col-sm-4 label_right"> <input
+											type="radio" name="type" ng-model="daybook.transactionType"
+											id="creditType" required value="CREDIT"
+											ng-class="{errors: isValidate(myform,myform.type)}" />Credit
+										</label> <label class="col-sm-4 label_right"> <input
+											type="radio" name="type" ng-model="daybook.transactionType"
+											id="debitType" required value="DEBIT"
+											ng-class="{errors: isValidate(myform,myform.type)}" />Debit
+										</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-4 label_right">Notes : </label>
+									<div class="col-sm-8 label_right">
+										<textarea class="form-control" id="description"
+											name="description" ng-model="daybook.transactionDesc"
+											rows="2" cols="20"
+											ng-class="{errors: isValidate(myform,myform.description)}">
 									</textarea>
+									</div>
 								</div>
-							</div>
-							<div class="form-group ">
-								<span class="col-sm-10"></span>
-								<button 
-								type="button" 
-								class="btn btn-primary"
-								ng-disabled='myform.$invalid'
-								ng-click="saveOrUpdateDaybook(myform,daybook)">
-								Save
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-7">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Day Book Records</h3>
-					</div>
-					<div class="panel-body">
-						<form>
-							<div class="form-group">
-								<label class="col-sm-2 label_left">Search</label>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-6 searchTextBox">
-									<input type="text" class="form-control" id="search"
-										ng-model="searchText">
+								<div class="form-group ">
+
+									<span class="col-sm-10"> </span>
+									<button type="button" class="btn btn-primary"
+										ng-disabled='myform.$invalid'
+										ng-click="saveOrUpdateDaybook(myform,daybook)">Save</button>
 								</div>
-							</div>
-						</form>
-						<table class="table table-striped table-bordered" style="font-size:13px;">
-							<thead>
-								<th><em class="fa fa-cog"></em></th>
-								<th>Date</th>
-								<th>Account Name</th>
-								<th>Account No</th>
-								<th>Credit</th>
-								<th>Debit</th>
-							</thead>
-							<tbody>
-								<tr ng-repeat="daybook in dayBookList | filter : searchText | limitTo : 100">
-									<td align="center">
-										<a class="btn btn-default" ng-click="editBook(daybook)"><em class="fa fa-pencil"></em></a> 
-										<a class="btn btn-danger" ng-click="deleteBook(daybook)"><em class="fa fa-trash"></em></a>
-									</td>
-									<td ng-bind="daybook.transactionDate | date :'dd-MM-yyyy'"></td>
-									<td ng-bind="daybook.accountName"></td>
-									<td ng-bind="daybook.accountNumber"></td>
-									<td ng-bind="daybook.transactionType=='CREDIT' ? daybook.transactionAmount : ''"></td>
-									<td ng-bind="daybook.transactionType=='DEBIT' ? daybook.transactionAmount :''"></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div class="panel-footer">
-					<div class="row">
-						<div class="col col-xs-12 pull-right">
-							<ul class="pagination hidden-xs pull-right">
-								<li><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">4</a></li>
-								<li><a href="#">5</a></li>
-							</ul>
-							<ul class="pagination visible-xs pull-right">
-								<li><a href="#">«</a></li>
-								<li><a href="#">»</a></li>
-							</ul>
+							</form>
 						</div>
 					</div>
 				</div>
+				<div class="col-sm-7">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Day Book Records</h3>
+						</div>
+						<div class="panel-body">
+							<form>
+								<div class="form-group">
+									<label class="col-sm-2 label_left">Search</label>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-6 searchTextBox">
+										<input type="text" class="form-control" id="search"
+											ng-model="searchText">
+									</div>
+									<div class="col-sm-4">
+										<button type="button" class="btn btn-primary"
+											ng-click="hide(true)">View Daybook</button>
+									</div>
+								</div>
+							</form>
+							<div>
+								<table class="table table-striped table-bordered"
+									style="font-size: 13px;">
+									<thead>
+										<th><em class="fa fa-cog"></em></th>
+										<th>Date</th>
+										<th>Account Name</th>
+										<th>Account No</th>
+										<th>Credit</th>
+										<th>Debit</th>
+									</thead>
+									<tbody>
+										<tr
+											ng-repeat="daybook in dayBookList | filter : searchText | limitTo : 100">
+											<td align="center"><a class="btn btn-default"
+												ng-click="editBook(daybook)"><em class="fa fa-pencil"></em></a>
+												<a class="btn btn-danger" ng-click="deleteBook(daybook)"><em
+													class="fa fa-trash"></em></a></td>
+											<td ng-bind="daybook.transactionDate | date :'dd-MM-yyyy'"></td>
+											<td ng-bind="daybook.accountName"></td>
+											<td ng-bind="daybook.accountNumber"></td>
+											<td
+												ng-bind="daybook.transactionType=='CREDIT' ? daybook.transactionAmount : ''"></td>
+											<td
+												ng-bind="daybook.transactionType=='DEBIT' ? daybook.transactionAmount :''"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="panel-footer">
+						<div class="row">
+							<div class="col col-xs-12 pull-right">
+								<ul class="pagination hidden-xs pull-right">
+									<li><a href="#">1</a></li>
+									<li><a href="#">2</a></li>
+									<li><a href="#">3</a></li>
+									<li><a href="#">4</a></li>
+									<li><a href="#">5</a></li>
+								</ul>
+								<ul class="pagination visible-xs pull-right">
+									<li><a href="#">«</a></li>
+									<li><a href="#">»</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id='tableContent' ng-hide="true">
+					<table border="1" style="width: 50%;">
+						<thead>
+							<tr>
+								<th colspan="4"
+									style='text-align: center; background-color: #337ab7;'>M.RM</th>
+							</tr>
+							<tr>
+								<th colspan="4"
+									style='text-align: center; background-color: #337ab7;'>Trichy</th>
+							</tr>
+							<tr>
+								<th colspan='3'
+									style='text-align: left; background-color: #337ab7;'>Day
+									Book For XXXX to XXXX</th>
+								<th style='text-align: left; background-color: #337ab7;'>Date:</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th>DATE</th>
+								<th>Account Name</th>
+								<th>Credit</th>
+								<th>Debit</th>
+							</tr>
+							<tr ng-repeat="daybook in dayBookList"
+								style="background-color: white;">
+								<td ng-bind="daybook.transactionDate | date :'dd-MM-yyyy'"></td>
+								<td ng-bind="daybook.accountName" style='text-align: right;'></td>
+								<td
+									ng-bind="daybook.transactionType=='CREDIT' ? daybook.transactionAmount : ''"></td>
+								<td
+									ng-bind="daybook.transactionType=='DEBIT' ? daybook.transactionAmount :''"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
+		    <div ng-show='dayBookView' ng-include="'/flycatcher/screen/dayBook/daybook.view.html'"></div>
 		</div>
 	</div>
 </div>

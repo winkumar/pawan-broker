@@ -1,0 +1,131 @@
+<table border="1" style="width: 50%;font-size:13px;background-color:white;">
+	<thead>
+		<tr>
+			<th colspan="4"
+				style='text-align: center; background-color: #337ab7;'>M.RM</th>
+		</tr>
+		<tr>
+			<th colspan="4"
+				style='text-align: center; background-color: #337ab7;'>Trichy</th>
+		</tr>
+		<tr>
+			<th colspan='2' style='text-align: left; background-color: #337ab7;'>
+				Journal Report For {{reportStartDate}} to {{reportEndDate}}</th>
+			<th colspan='2' style='text-align: left; background-color: #337ab7;'>Date:{{todayDate}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>DATE</th>
+			<th>Account Name</th>
+			<th>Credit</th>
+			<th>Debit</th>
+		</tr>
+		<tr ng-if="journalList.gold.transactions.length > 0">
+			<td ng-bind="journalList.gold.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="goldAcc in journalList.gold.transactions">
+			<td ng-bind="goldAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="goldAcc.accountName"></td>
+			<td
+				ng-bind="goldAcc.transactionType == 'CREDIT' ? goldAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="goldAcc.transactionType == 'DEBIT' ? goldAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if="journalList.gold.transactions.length > 0 ">
+			<td style="text-align:right;">Balance :
+			      <span ng-if="journalList.gold.credit < journalList.gold.debit" ng-bind="journalList.gold.debit-journalList.gold.credit"></span>
+				  <span  ng-if="journalList.gold.credit > journalList.gold.debit" ng-bind="journalList.gold.credit-journalList.gold.debit"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
+			<td ng-bind='journalList.gold.credit'></td>
+			<td ng-bind='journalList.gold.debit'></td>
+		</tr>
+		
+		<tr ng-if="journalList.gain.transactions.length > 0 ">
+			<td ng-bind="journalList.gain.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="gainAcc in journalList.gain.transactions">
+			<td ng-bind="gainAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="gainAcc.accountName"></td>
+			<td
+				ng-bind="gainAcc.transactionType == 'CREDIT' ? gainAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="gainAcc.transactionType == 'DEBIT' ? gainAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if="journalList.gain.transactions.length > 0">
+			<td colspan='2' style="text-align:right;">Total</td>
+			<td ng-bind='journalList.gain.credit'></td>
+			<td ng-bind='journalList.gain.debit'></td>
+		</tr>
+		
+		<tr ng-if="journalList.capital.transactions.length > 0 ">
+			<td ng-bind="journalList.capital.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="capitalAcc in journalList.capital.transactions">
+			<td ng-bind="capitalAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="capitalAcc.accountName"></td>
+			<td
+				ng-bind="capitalAcc.transactionType == 'CREDIT' ? capitalAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="capitalAcc.transactionType == 'DEBIT' ? capitalAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if="journalList.capital.transactions.length > 0 ">
+			<td colspan='2' style="text-align:right;">Total</td>
+			<td ng-bind='journalList.capital.credit'></td>
+			<td ng-bind='journalList.capital.debit'></td>
+		</tr>
+		<tr ng-if="journalList.bank.transactions.length > 0 ">
+			<td ng-bind="journalList.bank.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="bankAcc in journalList.bank.transactions">
+			<td ng-bind="bankAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="bankAcc.accountName"></td>
+			<td
+				ng-bind="bankAcc.transactionType == 'CREDIT' ? bankAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="bankAcc.transactionType == 'DEBIT' ? bankAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if="journalList.bank.transactions.length > 0 ">
+			<td colspan='2' style="text-align:right;" >Total</td>
+			<td ng-bind='journalList.bank.credit'></td>
+			<td ng-bind='journalList.bank.debit'></td>
+		</tr>
+		<tr ng-if="journalList.personal.transactions.length > 0 ">
+			<td ng-bind="journalList.personal.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="personalAcc in journalList.personal.transactions">
+			<td ng-bind="personalAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="personalAcc.accountName"></td>
+			<td
+				ng-bind="personalAcc.transactionType == 'CREDIT' ? personalAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="personalAcc.transactionType == 'DEBIT' ? personalAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if="journalList.personal.transactions.length > 0 ">
+			<td colspan='2' style="text-align:right;">
+			 <span style="text-align:left;" ng-bind="journalList.personal.credit-journalList.personal.debit"></span>
+				Total
+			</td>
+			<td ng-bind='journalList.personal.credit'></td>
+			<td ng-bind='journalList.personal.debit'></td>
+		</tr>
+
+		<tr ng-if="journalList.expense.transactions.length > 0 ">
+			<td ng-bind="journalList.expense.accountType" colspan='4'></td>
+		</tr>
+		<tr ng-repeat="expenseAcc in journalList.expense.transactions">
+			<td ng-bind="expenseAcc.transactionDate | date :'dd-MM-yyyy'"></td>
+			<td ng-bind="expenseAcc.accountName"></td>
+			<td
+				ng-bind="expenseAcc.transactionType == 'CREDIT' ? expenseAcc.transactionAmount :''"></td>
+			<td
+				ng-bind="expenseAcc.transactionType == 'DEBIT' ? expenseAcc.transactionAmount : ''"></td>
+		</tr>
+		<tr ng-if='journalList.expense.transactions.length > 0'>
+			<td colspan='2' style="text-align:right;">Total</td>
+			<td ng-bind='journalList.expense.credit'></td>
+			<td ng-bind='journalList.expense.debit'></td>
+		</tr>
+	</tbody>
+</table>

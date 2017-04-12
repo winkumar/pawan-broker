@@ -4,11 +4,15 @@
 		$scope.dayBookList = null;
 		$scope.ediMode = false;
 		$scope.accountList = null;
+		$scope.reportStartDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
+    	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
+    	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy');
 		$scope.daybook = {
 		   transactionDate : new Date()
 		}
 		
 		$scope.init =function(){
+			$scope.hide(false);
 			$http({
 	    	    method: 'GET',
 	    	    url: '/api/v1/dayBooks',
@@ -120,7 +124,18 @@
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
 	    	});
-	   }
+	   };
+	   
+	   $scope.exportData = function () {
+	        var blob = new Blob([document.getElementById('tableContent').innerHTML], {
+	            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+	        });
+	        saveAs(blob, "BalanceSheet.xls");
+	   };
+	    
+	   $scope.hide = function(val){
+		   $scope.dayBookView = val;
+	   } 
 	   
 	});
 }());

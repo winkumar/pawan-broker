@@ -7,7 +7,9 @@
 			  startDate : "",
 			  endDate : ""
 		};
-		
+		$scope.reportStartDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
+    	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
+    	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy'); 
 		$scope.init = function(){
 			$scope.getJournal('/api/v1/journals?sort=ASC');
 		};
@@ -36,11 +38,20 @@
 	    	var url = '/api/v1/journals?sort=ASC';
 	    	if(journalSearch.startDate){
 	    		url +="&startDate="+ $filter('date')(journalSearch.startDate,'dd-MM-yyyy'); 
+	    		$scope.reportStartDate=$filter('date')(journalSearch.startDate,'dd-MM-yyyy'); 
 	    	}
 	    	if(journalSearch.endDate){
-	    		url +="&endDate="+ $filter('date')(journalSearch.endDate,'dd-MM-yyyy');; 
+	    		url +="&endDate="+ $filter('date')(journalSearch.endDate,'dd-MM-yyyy'); 
+	    		$scope.reportEndDate=$filter('date')(journalSearch.endDate,'dd-MM-yyyy'); 
 	    	}
 	    	$scope.getJournal(url);
-	    }
+	    };
+	    
+	    $scope.exportData = function (journalSearch) {
+	        var blob = new Blob([document.getElementById('tableContent').innerHTML], {
+	            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+	        });
+	        saveAs(blob, "JournalReport-"+$scope.todayDate+".xls");
+	    };
 	});
 }());
