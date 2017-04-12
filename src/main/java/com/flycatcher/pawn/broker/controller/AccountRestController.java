@@ -486,7 +486,7 @@ public class AccountRestController extends AbstractRestHandler {
 		}
 		
 		Sort sort=new Sort(sortDirection,"transactionDate");
-		List<DayBook> dayBooks=this.dayBookService.getAllDayBookByAccount(account, sort);
+		List<DayBook> dayBooks=this.dayBookService.getDayBooks(account, sort);
 		
 		List<DayBookInfo> dayBookInfos=new ArrayList<DayBookInfo>();
 		if(dayBooks!=null){

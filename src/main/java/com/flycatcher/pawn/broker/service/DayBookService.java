@@ -22,11 +22,14 @@ public interface DayBookService {
 	
 	Page<DayBook> getPageOfDayBook(String search,Pageable pageable);
 	List<DayBook> getAllDayBook(Sort sort);
-	List<DayBook> getJournal(Sort sort,Set<Account> accounts,Timestamp startDate,Timestamp endDate);
+	List<DayBook> getDayBooks(Set<Account> accounts,Timestamp startDate,Timestamp endDate,Sort sort);
+	List<DayBook> getDayBooks(Timestamp startDate,Timestamp endDate,Sort sort);
+	List<DayBook> getDayBooks(Account account,Sort sort);
+	List<DayBook> getDayBooks(Timestamp startDate,Timestamp endDate,Account account,Sort sort);
 	DayBook getDayBookById(Long dayBookId);
 	DayBook createOrUpdateDayBook(DayBook dayBook);
 	void removeDayBookById(Long dayBookId);
-	List<DayBook> getAllDayBookByAccount(Account account,Sort sort);
+	
 
 }
 

@@ -77,17 +77,33 @@ public class DayBookServiceImpl implements DayBookService {
 	}
 
 	@Override
-	public List<DayBook> getAllDayBookByAccount(Account account, Sort sort) {
+	public List<DayBook> getDayBooks(Account account, Sort sort) {
 		LOGGER.debug("--- get daybook by account -> {} , sort -> {} ---",account,sort);
 		return this.dayBookRepository.findByAccount(account, sort);
 	}
 
 	@Override
-	public List<DayBook> getJournal(Sort sort,Set<Account> accounts,
-			Timestamp startDate, Timestamp endDate) {
+	public List<DayBook> getDayBooks(Set<Account> accounts,
+			Timestamp startDate, Timestamp endDate,Sort sort) {
 		LOGGER.debug("--- get joournal page by sort -> {} , accounts -> {} ,startDate -> {} , endDate -> {} ---",sort,accounts,startDate,endDate);
-		return this.dayBookRepository.findByAccount( startDate, endDate,accounts, sort);
+		return this.dayBookRepository.findDayBooks( startDate, endDate,accounts, sort);
 	}
+
+	@Override
+	public List<DayBook> getDayBooks(Timestamp startDate,
+			Timestamp endDate,Sort sort) {
+		LOGGER.debug("--- get day book by date , sort -> {} , startDate -> {} , endDate -> {} ---",sort,startDate,endDate);
+		return this.dayBookRepository.findDayBooks(startDate, endDate, sort);
+	}
+
+	@Override
+	public List<DayBook> getDayBooks(Timestamp startDate, Timestamp endDate,
+			Account account, Sort sort) {
+		LOGGER.debug("--- get daybook by startDate -> {} , endDate -> {} , account -> {} , sort -> {} ---",startDate,endDate,account,sort);
+		return this.getDayBooks( startDate, endDate,account,sort);
+	}
+	
+	
 
 }
 
