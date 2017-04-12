@@ -1,9 +1,15 @@
 package com.flycatcher.pawn.broker.controller;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,14 +40,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flycatcher.pawn.broker.UrlPath;
+import com.flycatcher.pawn.broker.exception.DataFormatException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
+import com.flycatcher.pawn.broker.model.AccountType;
 import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.model.TransactionType;
 import com.flycatcher.pawn.broker.model.UserInfo;
 import com.flycatcher.pawn.broker.pojo.DayBookInfo;
 import com.flycatcher.pawn.broker.pojo.DayBookPageInfo;
 import com.flycatcher.pawn.broker.service.AccountService;
+import com.flycatcher.pawn.broker.service.AccountTypeService;
 import com.flycatcher.pawn.broker.service.DayBookService;
 import com.flycatcher.pawn.broker.service.UserInfoService;
 
@@ -61,15 +70,17 @@ public class DayBookRestController extends AbstractRestHandler{
 	private final DayBookService dayBookService;
 	private final UserInfoService userInfoService;
 	private final AccountService accountService;
+	private final AccountTypeService accountTypeService;
 	
 	@Autowired
-	public DayBookRestController(final DayBookService dayBookService,final UserInfoService userInfoService,final AccountService accountService){
+	public DayBookRestController(final DayBookService dayBookService,final UserInfoService userInfoService,final AccountService accountService,
+								 final AccountTypeService accountTypeService){
 		LOGGER.info("--- DayBookRestController Invoked ---");
 		
 		this.dayBookService=dayBookService;
 		this.userInfoService=userInfoService;
 		this.accountService=accountService;
-								
+	    this.accountTypeService=accountTypeService;
 	}
 	
 	
@@ -147,46 +158,160 @@ public class DayBookRestController extends AbstractRestHandler{
 	@RequestMapping(value = "/all",
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    @ApiOperation(value = "Get all daybook.", notes = "It will provide of list of daybooks.")
+    @ApiOperation(value = "Get all daybook by start date.", notes = "It will provide of list of daybooks by specific date.")
 	@ApiImplicitParams({@ApiImplicitParam(name = "X-Access-Token", required = true, dataType = "string", paramType = "header")})
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
     public    @ResponseBody
     ResponseEntity<?> getAllDayBook(@ApiParam(value = "The daybook  sort by transaction date", required = true)
     								@RequestParam(value = "sort", required = true, defaultValue = DEFAULT_PAGE_SORT) Sort.Direction sortDirection ,
+    								@ApiParam(value = "The daybook transaction start date", required = false)
+    								@RequestParam(value = "startDate", required = false) String startDateString ,
+    								@ApiParam(value = "The daybook transaction end date", required = false)
+    								@RequestParam(value = "endDate", required = false) String endDateString,
+    								@ApiParam(value = "The account type", required = false)
+    								@RequestParam(value = "accountType", required = false, defaultValue="-1") Long accountTypeId,
+    								@ApiParam(value = "The account", required = false)
+    								@RequestParam(value = "account", required = false) Long accountId,
 									HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info("--- get all daybook rest controller invoked , sort -> {} ---",sortDirection);
 		
 		Sort sort=new Sort(sortDirection,"transactionDate");
-		List<DayBook> dayBooks=this.dayBookService.getAllDayBook(sort);
 		
+		Date startDate,endDate;
 		
-		List<DayBookInfo> dayBookInfos=new ArrayList<DayBookInfo>();
-		if(dayBooks!=null){
-	    	dayBooks.forEach(dayBook -> {
-	    		DayBookInfo dayBookInfo=new DayBookInfo();
-	    		
-	    		dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
-	    		dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
-	    		dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
-	    		dayBookInfo.setAccountTypeId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountType().getId():null);
-	    		dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
-	    		dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
-	    		dayBookInfo.setDayBookId(dayBook.getDayBookId());
-	    		dayBookInfo.setModifiedBy(dayBook.getModifiedBy()!=null?dayBook.getModifiedBy().getFirstName():null);
-	    		dayBookInfo.setModifiedDate(dayBook.getModifiedDate());
-	    		dayBookInfo.setTransactionAmount(dayBook.getTransactionAmount());
-	    		dayBookInfo.setTransactionDate(dayBook.getTransactionDate());
-	    		dayBookInfo.setTransactionDesc(dayBook.getTransactionDesc());
-	    		dayBookInfo.setTransactionType(dayBook.getTransactionType()!=null?dayBook.getTransactionType().name():null);
-	    		
-	    		dayBookInfos.add(dayBookInfo);
-	    	});
-	    }
+		if(startDateString==null){
+			LOGGER.debug("--- start date is null so start date become current date ---");
+			startDate=new Date();
+		}else{
+		    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		    try {
+		    	startDate = sdf.parse(startDateString);
+			} catch (ParseException e) {
+				LOGGER.debug("--- date parse exception ---");
+				throw new DataFormatException("start date parse doesn't exist's ...!");
+			}
+		}
 		
-
+		if(endDateString==null){
+			LOGGER.debug("--- end date is null so end date become current date ---");
+			endDate=startDate;
+		}else{
+		    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		    try {
+		    	endDate = sdf.parse(endDateString);
+			} catch (ParseException e) {
+				LOGGER.debug("--- date parse exception ---");
+				throw new DataFormatException("start date parse doesn't exist's ...!");
+			}
+		}
+		
+		if(startDate.after(endDate)){
+			LOGGER.debug("--- start date should be same as end date or less than end date ---");
+			throw new DataFormatException("start date not less than end date ...!");
+		}
+				
+		Map<String, Object> dayBooks=null;
+				
+		
+		if(accountTypeId==-1 || accountTypeId==null){
+			List<DayBook> dBooks=this.dayBookService.getDayBooks(new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()), sort);
+			dayBooks=getDayBookInfo(dBooks);
+			
+		}else{
+			AccountType accountType=this.accountTypeService.getAccountType(accountTypeId);
+			if(accountType==null){
+				LOGGER.error("--- account type doesn't exist's , account type -> {} ---",accountTypeId);
+				throw new ResourceNotFoundException("account type doesn't exist's ...!");
+			}
+						
+			Set<Account> accounts=new HashSet<Account>();
+			if(accountId!=null){
+				Account account=this.accountService.getAccountById(accountId);
+				if(account==null){
+					LOGGER.error("--- account does not exist's , accountId -> {} ---",accountId);
+					throw new ResourceNotFoundException("account doesn't exist's ...!");
+				}
+				
+				if(!accountType.getAccounts().contains(account)){
+					LOGGER.debug("--- account does not under this account type ---");
+					throw new DataFormatException("account does not under this account type ..!");
+				}
+								
+				accounts.add(account);
+								
+				}else{
+					accounts=accountType.getAccounts();
+				}
+			
+			List<DayBook> dBooks=this.dayBookService.getDayBooks(accounts,new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()), sort);
+			dayBooks=getDayBookInfo(dBooks);
+		}
+				
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+		dayBooks.put("startDate", df.format(startDate));
+		dayBooks.put("endDate",  df.format(endDate));
+		
+		LOGGER.debug("--- daybook info object -> {}  ---",dayBooks);
 		LOGGER.info("--- daybook list return successfully ---");
-		return new ResponseEntity<>(dayBookInfos,HttpStatus.OK);
+		return new ResponseEntity<>(dayBooks,HttpStatus.OK);
 		
+	}
+	
+	/**
+	 * get daybook object return.
+	 * 
+	 * @param dayBooks , list of daybook object info
+	 * @return , it will return Map<String,Object> 
+	 */
+	private Map<String, Object> getDayBookInfo(List<DayBook> dayBooks){
+		
+		Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
+		List<DayBookInfo> transactions=new ArrayList<DayBookInfo>();
+		if(dayBooks!=null){
+			for(DayBook dayBook: dayBooks) {
+				
+				DayBookInfo dayBookInfo=new DayBookInfo();
+	    		
+			    dayBookInfo.setAccountId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountId():null);
+			    dayBookInfo.setAccountName(dayBook.getAccount()!=null?dayBook.getAccount().getFirstName():null);
+			    dayBookInfo.setAccountNumber(dayBook.getAccount()!=null?dayBook.getAccount().getAccountNumber():null);
+			    dayBookInfo.setAccountTypeId(dayBook.getAccount()!=null?dayBook.getAccount().getAccountType().getId():null);
+			    dayBookInfo.setCreatedBy(dayBook.getCreatedBy()!=null?dayBook.getCreatedBy().getFirstName():null);
+			    dayBookInfo.setCreatedDate(dayBook.getCreatedDate());
+			    dayBookInfo.setDayBookId(dayBook.getDayBookId());
+			    dayBookInfo.setModifiedBy(dayBook.getModifiedBy()!=null?dayBook.getModifiedBy().getFirstName():null);
+			    dayBookInfo.setModifiedDate(dayBook.getModifiedDate());
+			    dayBookInfo.setTransactionAmount(dayBook.getTransactionAmount());
+			    dayBookInfo.setTransactionDate(dayBook.getTransactionDate());
+			    dayBookInfo.setTransactionDesc(dayBook.getTransactionDesc());
+			    dayBookInfo.setTransactionType(dayBook.getTransactionType()!=null?dayBook.getTransactionType().name():null);
+			    				
+				
+				if(TransactionType.CREDIT.equals(dayBook.getTransactionType())){
+					creditAmount+=dayBook.getTransactionAmount()!=null?dayBook.getTransactionAmount():0.0;
+				}else{
+					debitAmount+=dayBook.getTransactionAmount()!=null?dayBook.getTransactionAmount():0.0;
+				}
+				
+				transactions.add(dayBookInfo);
+			}
+		}
+				
+		Map<String, Object> dayBook=new ConcurrentHashMap<String, Object>();
+		
+		dayBook.put("transactions", transactions);
+		dayBook.put("credit", creditAmount);
+		dayBook.put("debit", debitAmount);
+			
+		balance=creditAmount-debitAmount;
+		if(balance<=0)
+			dayBook.put("isPositive", false);
+		else
+			dayBook.put("isPositive", true);
+		
+		dayBook.put("balance", Math.abs(balance));
+		
+		return dayBook;
 	}
 	
 	

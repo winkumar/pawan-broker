@@ -169,7 +169,7 @@ public class JournalRestController extends AbstractRestHandler{
 			}
 		}
 		
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		journals.put("startDate", df.format(startDate));
 		journals.put("endDate",  df.format(endDate));
 		
@@ -186,7 +186,7 @@ public class JournalRestController extends AbstractRestHandler{
 		}*/
 		
 		Sort sort=new Sort(sortDirection,"transactionDate");
-		List<DayBook> dayBooks=this.dayBookService.getJournal(sort, accounts, new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()));
+		List<DayBook> dayBooks=this.dayBookService.getDayBooks( accounts, new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()),sort);
 		
 		
 		Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
