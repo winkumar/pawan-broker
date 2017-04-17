@@ -1,0 +1,35 @@
+<table border="1"
+	style="width: 50%; font-size: 13px; background-color: white;">
+	<thead>
+		<tr>
+			<th colspan="3"
+				style='text-align: center; background-color: #337ab7;'>M.RM</th>
+		</tr>
+		<tr>
+			<th colspan="3"
+				style='text-align: center; background-color: #337ab7;'>Trichy</th>
+		</tr>
+		<tr>
+			<th colspan='2' style='text-align: left; background-color: #337ab7;'>
+				Journal Report For {{reportStartDate}} to {{reportEndDate}}</th>
+			<th colspan='1' style='text-align: left; background-color: #337ab7;'>Date:{{todayDate}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>Account Type</th>
+			<th>Credit</th>
+			<th>Debit</th>
+		</tr>
+		<tr ng-repeat="balance in balanceSheetList.balanceSheet ">
+			<td ng-bind='balance.accountType'></td>
+			<td ng-bind='balance.isPositive ? balance.balance: 0 '></td>
+			<td ng-bind='!balance.isPositive ? balance.balance:0'></td>
+		</tr>
+		<tr style='font-weight: bold;'>
+			<td class='label_right'>Total</td>
+			<td ng-bind='balanceSheetList.totalCredit'></td>
+			<td ng-bind='balanceSheetList.totalDebit'></td>
+		</tr>
+	</tbody>
+</table>

@@ -32,10 +32,9 @@
 			<td
 				ng-bind="goldAcc.transactionType == 'DEBIT' ? goldAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if="journalList.gold.transactions.length > 0 ">
+		<tr ng-if="journalList.gold.transactions.length > 0 " style='font-weight:bold;'>
 			<td style="text-align:right;">Balance :
-			      <span ng-if="journalList.gold.credit < journalList.gold.debit" ng-bind="journalList.gold.debit-journalList.gold.credit"></span>
-				  <span  ng-if="journalList.gold.credit > journalList.gold.debit" ng-bind="journalList.gold.credit-journalList.gold.debit"></span>
+			   <span ng-bind="journalList.gold.balance"></span>
 			 </td>
 			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.gold.credit'></td>
@@ -53,8 +52,11 @@
 			<td
 				ng-bind="gainAcc.transactionType == 'DEBIT' ? gainAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if="journalList.gain.transactions.length > 0">
-			<td colspan='2' style="text-align:right;">Total</td>
+		<tr ng-if="journalList.gain.transactions.length > 0" style='font-weight:bold;'>
+			<td style="text-align:right;">Balance :
+			    <span ng-bind="journalList.gain.balance"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.gain.credit'></td>
 			<td ng-bind='journalList.gain.debit'></td>
 		</tr>
@@ -70,8 +72,11 @@
 			<td
 				ng-bind="capitalAcc.transactionType == 'DEBIT' ? capitalAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if="journalList.capital.transactions.length > 0 ">
-			<td colspan='2' style="text-align:right;">Total</td>
+		<tr ng-if="journalList.capital.transactions.length > 0 " style='font-weight:bold;'>
+			<td style="text-align:right;">Balance :
+			     <span ng-bind="journalList.capital.balance"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.capital.credit'></td>
 			<td ng-bind='journalList.capital.debit'></td>
 		</tr>
@@ -86,8 +91,11 @@
 			<td
 				ng-bind="bankAcc.transactionType == 'DEBIT' ? bankAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if="journalList.bank.transactions.length > 0 ">
-			<td colspan='2' style="text-align:right;" >Total</td>
+		<tr ng-if="journalList.bank.transactions.length > 0 " style='font-weight:bold;'>
+			<td style="text-align:right;">Balance :
+			   <span ng-bind="journalList.bank.balance"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.bank.credit'></td>
 			<td ng-bind='journalList.bank.debit'></td>
 		</tr>
@@ -102,11 +110,11 @@
 			<td
 				ng-bind="personalAcc.transactionType == 'DEBIT' ? personalAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if="journalList.personal.transactions.length > 0 ">
-			<td colspan='2' style="text-align:right;">
-			 <span style="text-align:left;" ng-bind="journalList.personal.credit-journalList.personal.debit"></span>
-				Total
-			</td>
+		<tr ng-if="journalList.personal.transactions.length > 0 " style='font-weight:bold;'>
+			<td style="text-align:right;">Balance :
+			   <span ng-bind="journalList.personal.balance"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.personal.credit'></td>
 			<td ng-bind='journalList.personal.debit'></td>
 		</tr>
@@ -122,8 +130,11 @@
 			<td
 				ng-bind="expenseAcc.transactionType == 'DEBIT' ? expenseAcc.transactionAmount : ''"></td>
 		</tr>
-		<tr ng-if='journalList.expense.transactions.length > 0'>
-			<td colspan='2' style="text-align:right;">Total</td>
+		<tr ng-if='journalList.expense.transactions.length > 0' style='font-weight:bold;'>
+			<td style="text-align:right;">Balance :
+			    <span ng-bind="journalList.expense.balance"></span>
+			 </td>
+			<td style="text-align:right;">Total</td>
 			<td ng-bind='journalList.expense.credit'></td>
 			<td ng-bind='journalList.expense.debit'></td>
 		</tr>

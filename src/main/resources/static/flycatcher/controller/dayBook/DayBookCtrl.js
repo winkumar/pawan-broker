@@ -1,17 +1,21 @@
 'use strict';
 (function() {
-	angular.module('myApp.account').controller('DayBookCtrl', function($scope, $http, $attrs, $location) {
+	angular.module('myApp.account').controller('DayBookCtrl', function($scope, $http, $attrs, $location,$filter) {
 		$scope.dayBookList = null;
 		$scope.ediMode = false;
 		$scope.accountList = null;
 		$scope.reportStartDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy');
-		$scope.daybook = {
-		   transactionDate : new Date()
-		}
+    	
+    	$scope.setTransactionDate = function(){
+			 $scope.daybook = {
+			    transactionDate : new Date()
+			 }
+	    }
 		
 		$scope.init =function(){
+			$scope.setTransactionDate();
 			$scope.hide(false);
 			$http({
 	    	    method: 'GET',
@@ -25,10 +29,10 @@
 	    	});
 		};
 	
-		$scope.editBook = function(daybook){
+		$scope.editBook = function(daybook,accountType){
 		   $scope.ediMode = true;
-		   daybook.accountType = 1;
-		   $scope.loadAccounts(daybook.accountType);
+		   daybook.accountType = accountType;
+		   $scope.loadAccounts(accountType);
 		   daybook.transactionDate = new Date(daybook.transactionDate);
 		   $scope.daybook = daybook;
 	   };
@@ -36,7 +40,7 @@
 	   $scope.accountTypes = function(){
 		   $http({
 	    	    method: 'GET',
-	    	    url: '/api/v1/accountTypes?sort=ASC',
+	    	    url: '/api/v1/accountTypes?sort=DESC',
 	    	    headers: {'Content-Type': 'application/json'}
 	    	}).success(function(data, status, headers, config){
 	    		$scope.accountTypeList = data;
@@ -88,8 +92,8 @@
 	    	    data  : daybook,
 	    	    headers: {'Content-Type': 'application/json'}
 	    	}).success(function(data, status, headers, config){
-	    		$scope.init();
 	    		$scope.daybook = null;
+	    		$scope.init();
 	    		myform.$dirty = false;
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
@@ -104,9 +108,9 @@
 	    	    data  : daybook,
 	    	    headers: {'Content-Type': 'application/json'}
 	    	}).success(function(data, status, headers, config){
+	    		$scope.daybook = null;
 	    		$scope.init();
 	    		myform.$dirty = false;
-	    		$scope.daybook = null;
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
 	    	});
@@ -119,23 +123,54 @@
 	    	    data  : daybook,
 	    	    headers: {'Content-Type': 'application/json'}
 	    	}).success(function(data, status, headers, config){
-	    		$scope.init();
 	    		$scope.daybook = null;
+	    		$scope.init();
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
 	    	});
 	   };
 	   
 	   $scope.exportData = function () {
-	        var blob = new Blob([document.getElementById('tableContent').innerHTML], {
+	        var blob = new Blob([document.getElementById('daybookContent').innerHTML], {
 	            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
 	        });
-	        saveAs(blob, "BalanceSheet.xls");
+	        saveAs(blob, "DayBook-"+$scope.todayDate+".xls");
 	   };
 	    
 	   $scope.hide = function(val){
 		   $scope.dayBookView = val;
+		   $scope.search(null);
 	   } 
 	   
+	   $scope.daybookList = function(url){
+		   $http({
+	    	    method: 'GET',
+	    	    url: url,
+	    	    headers: {'Content-Type': 'application/json'}
+	    	}).success(function(data, status, headers, config){
+	    		$scope.dayBookSearchList = data;
+	    	}).error(function(data, status, headers, config){
+	    		$scope.errormessage = data.message;
+	    	});
+	   }
+	   
+	   
+	    $scope.search = function(data){
+	    	var url = "/api/v1/dayBooks/all?sort=ASC";
+	    	if(data == null || data == undefined){
+	    		$scope.daybookList(url);
+	    	}else{
+	    	if(data.startDate){
+	    		url +="&startDate="+ $filter('date')(data.startDate,'dd-MM-yyyy'); 
+	    		$scope.reportStartDate=$filter('date')(data.startDate,'dd-MM-yyyy'); 
+	    	}
+	    	if(data.endDate){
+	    		url +="&endDate="+ $filter('date')(data.endDate,'dd-MM-yyyy'); 
+	    		$scope.reportEndDate=$filter('date')(data.endDate,'dd-MM-yyyy'); 
+	    	}
+	    	 $scope.daybookList(url);
+	    	}
+	    };
+	   	   
 	});
 }());

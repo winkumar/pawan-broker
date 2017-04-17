@@ -1,0 +1,45 @@
+<div>
+	<table border="1"
+		style="width: 50%; font-size: 13px; background-color: white;">
+		<thead>
+			<tr>
+				<th colspan="5"
+					style='text-align: center; background-color: #337ab7;'>M.RM</th>
+			</tr>
+			<tr>
+				<th colspan="5"
+					style='text-align: center; background-color: #337ab7;'>Trichy</th>
+			</tr>
+			<tr>
+				<th colspan='3' style='text-align: left; background-color: #337ab7;'>
+					Daybook Report For {{reportStartDate}} to {{reportEndDate}}</th>
+				<th colspan='2' style='text-align: left; background-color: #337ab7;'>Date:{{todayDate}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th>Date</th>
+				<th>Account No</th>
+				<th>Account Name</th>
+				<th>Credit</th>
+				<th>Debit</th>
+			</tr>
+			<tr ng-repeat="book in dayBookSearchList.transactions">
+				<td ng-bind="book.transactionDate | date :'dd-MM-yyyy'"></td>
+				<td ng-bind="book.accountNumber"></td>
+				<td ng-bind="book.accountName"></td>
+				<td class='label_right'
+					ng-bind="book.transactionType == 'CREDIT' ? book.transactionAmount :''"></td>
+				<td class='label_right'
+					ng-bind="book.transactionType == 'DEBIT' ? book.transactionAmount : ''"></td>
+			</tr>
+			<tr>
+				<td colspan="2"><b>Balance : <span
+						ng-bind='dayBookSearchList.balance'></span></b></td>
+				<td style="text-align: right;">Total:</span></td>
+				<td ng-bind="dayBookSearchList.credit"></td>
+				<td ng-bind="dayBookSearchList.debit"></td>
+			</tr>
+		</tbody>
+	</table>
+</div>

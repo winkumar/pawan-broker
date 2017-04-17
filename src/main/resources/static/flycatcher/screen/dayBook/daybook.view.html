@@ -4,7 +4,7 @@
 	</div>
 	<div class="panel-body">
 		<form name="myform" id="myform"
-			class="form-horizontal fv-form fv-form-bootstrap" ng-init="init()">
+			class="form-horizontal fv-form fv-form-bootstrap">
 
 			<div class="form-group">
 				<label class="col-sm-1 label_right">From</label>
@@ -42,10 +42,26 @@
 						</tr>
 					</thead>
 					<tbody>
-						
+						<tr ng-repeat="book in dayBookSearchList.transactions">
+						   <td ng-bind="book.transactionDate | date :'dd-MM-yyyy'"></td>
+						   <td ng-bind="book.accountNumber"></td>
+						   <td ng-bind="book.accountName"></td>
+						   <td ng-bind="book.transactionDesc"></td>
+						   <td class='label_right' ng-bind="book.transactionType == 'CREDIT' ? book.transactionAmount :''"></td>
+						   <td class='label_right'  ng-bind="book.transactionType == 'DEBIT' ? book.transactionAmount : ''"></td>
+						</tr>
+						<tr>
+						 <td colspan="2"> <b>Balance : <span ng-bind='dayBookSearchList.balance'></span></b></td>
+						 <td class='label_right' colspan="2"> Total:</span></td>
+						 <td class='label_right' ng-bind="dayBookSearchList.credit"></td>
+						 <td class='label_right' ng-bind="dayBookSearchList.debit"></td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
 		</form>
 	</div>
+	<div id='daybookContent' ng-hide='true'>
+		<div ng-include="'/flycatcher/screen/dayBook/daybook.report.html'"></div>
+	</div>	
 </div>

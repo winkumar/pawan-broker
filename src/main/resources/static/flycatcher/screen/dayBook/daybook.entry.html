@@ -118,9 +118,9 @@
 									</thead>
 									<tbody>
 										<tr
-											ng-repeat="daybook in dayBookList | filter : searchText | limitTo : 100">
+											ng-repeat="daybook in dayBookList | filter : searchText">
 											<td align="center"><a class="btn btn-default"
-												ng-click="editBook(daybook)"><em class="fa fa-pencil"></em></a>
+												ng-click="editBook(daybook,daybook.accountTypeId)"><em class="fa fa-pencil"></em></a>
 												<a class="btn btn-danger" ng-click="deleteBook(daybook)"><em
 													class="fa fa-trash"></em></a></td>
 											<td ng-bind="daybook.transactionDate | date :'dd-MM-yyyy'"></td>
@@ -155,45 +155,10 @@
 					</div>
 				</div>
 
-				<div id='tableContent' ng-hide="true">
-					<table border="1" style="width: 50%;">
-						<thead>
-							<tr>
-								<th colspan="4"
-									style='text-align: center; background-color: #337ab7;'>M.RM</th>
-							</tr>
-							<tr>
-								<th colspan="4"
-									style='text-align: center; background-color: #337ab7;'>Trichy</th>
-							</tr>
-							<tr>
-								<th colspan='3'
-									style='text-align: left; background-color: #337ab7;'>Day
-									Book For XXXX to XXXX</th>
-								<th style='text-align: left; background-color: #337ab7;'>Date:</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th>DATE</th>
-								<th>Account Name</th>
-								<th>Credit</th>
-								<th>Debit</th>
-							</tr>
-							<tr ng-repeat="daybook in dayBookList"
-								style="background-color: white;">
-								<td ng-bind="daybook.transactionDate | date :'dd-MM-yyyy'"></td>
-								<td ng-bind="daybook.accountName" style='text-align: right;'></td>
-								<td
-									ng-bind="daybook.transactionType=='CREDIT' ? daybook.transactionAmount : ''"></td>
-								<td
-									ng-bind="daybook.transactionType=='DEBIT' ? daybook.transactionAmount :''"></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
 			</div>
-		    <div ng-show='dayBookView' ng-include="'/flycatcher/screen/dayBook/daybook.view.html'"></div>
+			<div ng-show='dayBookView' ng-init=search()>
+				<div ng-include="'/flycatcher/screen/dayBook/daybook.view.html'"></div>
+			</div>
 		</div>
 	</div>
 </div>
