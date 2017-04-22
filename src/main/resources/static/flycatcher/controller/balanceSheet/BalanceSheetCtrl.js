@@ -7,12 +7,15 @@
     	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy'); 
     	
-		$scope.balanceSheetSearch = {
-			  startDate : "",
-			  endDate : ""
-		};
+    	$scope.setBalanceSheetSerachDate = function(){
+			$scope.balanceSheetSearch = {
+				  startDate : new Date(),
+				  endDate : new Date()
+			}
+    	}
 		
 		$scope.init = function(){
+			$scope.setBalanceSheetSerachDate();
 			$scope.getBalance('/api/v1/balanceSheets?sort=ASC');
 		};
 		
@@ -38,6 +41,9 @@
 	    
 	    $scope.search = function(balanceSheetSearch){
 	    	var url = '/api/v1/balanceSheets?sort=ASC';
+	    	if(balanceSheetSearch === null || balanceSheetSearch === undefined){
+	    		$scope.getBalance(url);
+	    	}else{
 	    	if(balanceSheetSearch.startDate){
 	    		url +="&startDate="+ $filter('date')(balanceSheetSearch.startDate,'dd-MM-yyyy'); 
 	    		$scope.reportStartDate=$filter('date')(balanceSheetSearch.startDate,'dd-MM-yyyy'); 
@@ -47,7 +53,7 @@
 	    		$scope.reportEndDate=$filter('date')(balanceSheetSearch.endDate,'dd-MM-yyyy'); 
 	    	}
 	    	$scope.getBalance(url);
-	    };
+	    }};
 	    
 	    $scope.exportData = function (balanceSheetSearch) {
 	        var blob = new Blob([document.getElementById('balanceSheetContent').innerHTML], {
@@ -56,5 +62,9 @@
 	        saveAs(blob, "BalanceSheetReport-"+$scope.todayDate+".xls");
 	    };
 	    
+	    $scope.clearsearch = function() {
+	    	$scope.setBalanceSheetSerachDate();
+	        $scope.search(null);
+	     } 
 	});
 }());

@@ -90,5 +90,10 @@
  	    		$scope.errormessage = data.message;
  	    	});
  	   }
+      
+        $scope.clear = function (myform) {
+        	if(myform.$dirty)
+        	 $scope.account =null;
+        }
     });
 } ());

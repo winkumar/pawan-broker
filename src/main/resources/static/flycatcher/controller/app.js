@@ -1,5 +1,6 @@
 'use strict';
 
+angular.module('myApp.NavCtrl',[]);
 angular.module('myApp.account',['ngMessages']);
 angular.module('myApp.login',[]);
 angular.module('myApp.dayBook',[]);
@@ -10,6 +11,7 @@ var denpency = [
 				'ngRoute',
 				'ngIdle',
 				'ngStorage',
+				 'myApp.NavCtrl',
 				'myApp.account',
 				'myApp.login',
 				'myApp.dayBook',

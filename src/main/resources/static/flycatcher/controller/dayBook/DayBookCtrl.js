@@ -8,6 +8,13 @@
     	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy');
     	
+    	$scope.setDefaultDayBookSearch = function(){
+  		    $scope.daybookSearch = {
+  		    	startDate : new Date(),
+  		    	endDate : new Date()
+  		    }
+  	    }
+    	
     	$scope.setTransactionDate = function(){
 			 $scope.daybook = {
 			    transactionDate : new Date()
@@ -24,6 +31,7 @@
 	    	}).success(function(data, status, headers, config){
 	    		$scope.dayBookList = data.dayBookInfos;
 	    		$scope.accountTypes();
+	    		$scope.setDefaultDayBookSearch();
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
 	    	});
@@ -171,6 +179,16 @@
 	    	 $scope.daybookList(url);
 	    	}
 	    };
-	   	   
+	    
+	    $scope.clear = function (myform) {
+        	if(myform.$dirty)
+        	 $scope.daybook =null;
+        	 $scope.setTransactionDate();
+        }  
+	    
+	    $scope.clearsearch = function() {
+	       $scope.setDefaultDayBookSearch();
+           $scope.search(null);
+        } 
 	});
 }());
