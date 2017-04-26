@@ -181,6 +181,21 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 				balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate));
 			}
 		}
+			
+		
+		AccountType accountType=this.accountTypeService.getAccountType(1L);
+		if(accountType!=null){
+			Set<Account> accounts=accountType.getAccounts();
+			if(!accounts.isEmpty()){
+				BalanceSheetInfo balanceSheetInfo=balanceSheet(sortDirection, accountType, accounts, startDate, endDate);
+				if(balanceSheetInfo!=null){
+					balanceSheetInfo.setIsPositive(false);
+					
+					balanceSheetInfos.add(balanceSheetInfo);
+				}
+			}
+		}
+				
 		Double debitAmount=0.0,creditAmount=0.0;
 		if(balanceSheetInfos!=null){
 			for(BalanceSheetInfo balanceSheetInfo:balanceSheetInfos){
@@ -243,6 +258,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 		
 		BalanceSheetInfo balanceSheetInfo=new BalanceSheetInfo();
 		
+		balanceSheetInfo.setAccountTypeId(accountType.getId());
 		balanceSheetInfo.setAccountType(accountType.getAccountType());
 		balanceSheetInfo.setBalance(Math.abs(balance));
 		balanceSheetInfo.setIsPositive(isPositive);

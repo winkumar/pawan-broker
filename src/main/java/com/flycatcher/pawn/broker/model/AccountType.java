@@ -55,10 +55,12 @@ public class AccountType implements Serializable {
 	
 	@Column(name="acc_start_from")
 	private String accStartFrom;
-	
-	
+		
 	@Column(name="account_type_api")
 	private String accountTypeApi;
+		
+	@Column(name="is_only_for_cashbook")
+	private Boolean isOnlyForCashbook;
 	
 
 	//bi-directional many-to-one association to Account

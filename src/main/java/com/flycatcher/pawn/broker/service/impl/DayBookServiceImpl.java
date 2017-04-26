@@ -100,7 +100,7 @@ public class DayBookServiceImpl implements DayBookService {
 	public List<DayBook> getDayBooks(Timestamp startDate, Timestamp endDate,
 			Account account, Sort sort) {
 		LOGGER.debug("--- get daybook by startDate -> {} , endDate -> {} , account -> {} , sort -> {} ---",startDate,endDate,account,sort);
-		return this.getDayBooks( startDate, endDate,account,sort);
+		return this.dayBookRepository.findDayBooks( startDate, endDate,account,sort);
 	}
 	
 	

@@ -17,6 +17,7 @@ import com.flycatcher.pawn.broker.model.AccountType;
 public interface AccountTypeService {
 
 	List<AccountType> getAllAccountType(Sort sort);
+	List<AccountType> getAllAccountTypeIncludeBalanceSheet(Sort sort);
 	AccountType getAccountType(Long accountTypeId);
 
 }

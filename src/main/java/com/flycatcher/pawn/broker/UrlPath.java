@@ -15,6 +15,7 @@ public class UrlPath {
 	public static final String ACCOUNT_TYPE_PATH="/api/v1/accountTypes";
 	public static final String JOURNAL_PATH="/api/v1/journals";
 	public static final String BALANCESHEET_PATH="/api/v1/balanceSheets";
+	public static final String CASHBOOK_PATH="/api/v1/cashBooks";
 
 }
 

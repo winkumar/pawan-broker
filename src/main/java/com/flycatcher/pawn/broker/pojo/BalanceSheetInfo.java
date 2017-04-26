@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class BalanceSheetInfo implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
+	private Long accountTypeId;
 	private String accountType;
 	private Double balance;
 	private Boolean isPositive;
