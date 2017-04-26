@@ -6,7 +6,7 @@
     	$scope.editMode = false;
     	
     	$scope.init = function(){
-    	   var url = "/api/v1/accounts?page=0&size=10&sort=ASC";
+    	   var url = "/api/v1/accounts?sort=ASC";
       	   $http({
   	    	    method: 'GET',
   	    	    url: url,
@@ -95,5 +95,31 @@
         	if(myform.$dirty)
         	 $scope.account =null;
         }
+        
+        $scope.getNextAndPreviousPage = function(url){
+        	$http({
+ 	    	    method: 'GET',
+ 	    	    url: url,
+ 	    	    headers: {'Content-Type': 'application/json'}
+ 	    	}).success(function(data, status, headers, config){
+ 	    		$scope.accountDetails = data;
+ 	    	}).error(function(data, status, headers, config){
+ 	    		$scope.errormessage = data.message;
+ 	    	});
+        }
+        
+        $scope.next = function () {
+        	var currentPage = $scope.accountDetails.pagePropertys.pageNumber+1;
+        	var totalPage = $scope.accountDetails.pagePropertys.totalPages;
+        	if(currentPage < totalPage) 
+        		$scope.getNextAndPreviousPage('/api/v1/accounts?page='+currentPage+'&sort=ASC');
+        };
+        
+        $scope.previous = function () {
+        	var currentPage = $scope.accountDetails.pagePropertys.pageNumber-1;
+        	var totalPage = $scope.accountDetails.pagePropertys.totalPages;
+        	if(currentPage >= 0) 
+        		$scope.getNextAndPreviousPage('/api/v1/accounts?page='+currentPage+'&sort=ASC');
+        };
     });
 } ());

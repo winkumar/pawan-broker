@@ -175,7 +175,7 @@
 								<th>Area</th>
 							</thead>
 							<tbody>
-								<tr ng-repeat="account in accountDetails.accountInfos | filter : searchText | limitTo : 10">
+								<tr ng-repeat="account in accountDetails.accountInfos | filter : searchText ">
 									<td align="center">
 									<a class="btn btn-default" ng-click="edit(account)"><em class="fa fa-pencil"></em></a>
 									<a class="btn btn-danger" ng-click="deleteAccount(account.accountId)"><em class="fa fa-trash"></em></a></td>
@@ -189,22 +189,15 @@
 						</table>
 					</div>
 				</div>
-				<div class="panel-footer">
-					<div class="row">
-						<div class="col col-xs-12 pull-right">
-							<ul class="pagination hidden-xs pull-right">
-								<li><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">4</a></li>
-								<li><a href="#">5</a></li>
-							</ul>
-							<ul class="pagination visible-xs pull-right">
-								<li><a href="#">«</a></li>
-								<li><a href="#">»</a></li>
-							</ul>
-						</div>
-					</div>
+				<div class="row" class='col-sm-12'>
+				    <div class="col-sm-8"></div>
+				    <div class="col-sm-4">
+				    	<span class="fa fa-angle-left fa-2x" ng-click="previous()"></span>
+				    	<span style="margin-left:10px;margin-right:10px;font-weight:bold;font-size:17px;">
+				    	{{accountDetails.pagePropertys.pageNumber}} of {{accountDetails.pagePropertys.totalPages-1}}
+				    	</span>
+				    	<span class="fa fa-angle-right fa-2x" ng-click="next()"></span>
+				    </div>
 				</div>
 			</div>
 		</div>
