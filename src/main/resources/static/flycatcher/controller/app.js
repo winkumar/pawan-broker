@@ -70,7 +70,7 @@ myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', f
 	      if(status === 401) {
 	        $timeout(function () {
 	          $location.path('/login');
-	        }, 300);
+	        }, 50);
 
 	      } else if(status !== 0) {
 	        $rootScope.showErrorMsg = true;
@@ -83,7 +83,7 @@ myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', f
 	  };
 }]);
 
-//myApp.config(['$httpProvider', function($httpProvider) {
-//	  $httpProvider.interceptors.push('authInterceptor');
-//}]);
+myApp.config(['$httpProvider', function($httpProvider) {
+  $httpProvider.interceptors.push('authInterceptor');
+}]);
  
