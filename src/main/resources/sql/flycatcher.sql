@@ -48,7 +48,7 @@ CREATE TABLE `account` (
   CONSTRAINT `account_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`),
   CONSTRAINT `account_ibfk_2` FOREIGN KEY (`modified_by`) REFERENCES `user_info` (`user_id`),
   CONSTRAINT `account_ibfk_3` FOREIGN KEY (`account_type`) REFERENCES `account_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -57,7 +57,7 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'ACC1','string','string','string','test','string','string','test','string','string','2017-03-31','2017-04-08',1,1,2),(2,'CA2','string','string','string','test','string','string','test','string','string','2017-04-08','2017-04-08',1,1,1),(3,'AA3','string','string','string','present address','string','string','test','string','string','2017-04-08','2017-04-08',1,1,3);
+INSERT INTO `account` VALUES (1,'CA1','string','string','string','test','string','string','test','string','string','2017-03-31','2017-04-08',1,1,1),(2,'CA2','string','string','string','test','string','string','test','string','string','2017-04-08','2017-04-08',1,1,1),(3,'AA3','string','string','string','present address','string','string','test','string','string','2017-04-08','2017-04-08',1,1,3),(5,'ACC1','string','string','string','test','string','string','test','string','string','2017-03-31','2017-04-08',1,1,2);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -75,6 +75,7 @@ CREATE TABLE `account_type` (
   `priority` int(11) DEFAULT NULL,
   `acc_start_from` varchar(50) DEFAULT NULL,
   `account_type_api` varchar(50) DEFAULT NULL,
+  `is_only_for_cashbook` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -85,7 +86,7 @@ CREATE TABLE `account_type` (
 
 LOCK TABLES `account_type` WRITE;
 /*!40000 ALTER TABLE `account_type` DISABLE KEYS */;
-INSERT INTO `account_type` VALUES (1,'Capital','Capital account',NULL,'CA','capital'),(2,'Gold Account','Gold Account',NULL,'GA','gold'),(3,'Gain Account','Gain Account',NULL,'AA','gain'),(4,'Expense Account','Expense Account',NULL,'EA','expense'),(5,'Personal Account','Personal Account',NULL,'PA','personal'),(6,'Bank Account','Bank Account',NULL,'BA','bank');
+INSERT INTO `account_type` VALUES (1,'Capital','Capital account',NULL,'CA','capital',1),(2,'Gold Account','Gold Account',NULL,'GA','gold',0),(3,'Gain Account','Gain Account',NULL,'AA','gain',0),(4,'Expense Account','Expense Account',NULL,'EA','expense',0),(5,'Personal Account','Personal Account',NULL,'PA','personal',0),(6,'Bank Account','Bank Account',NULL,'BA','bank',0);
 /*!40000 ALTER TABLE `account_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -114,7 +115,7 @@ CREATE TABLE `day_book` (
   CONSTRAINT `day_book_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`),
   CONSTRAINT `day_book_ibfk_2` FOREIGN KEY (`modified_by`) REFERENCES `user_info` (`user_id`),
   CONSTRAINT `day_book_ibfk_3` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +124,7 @@ CREATE TABLE `day_book` (
 
 LOCK TABLES `day_book` WRITE;
 /*!40000 ALTER TABLE `day_book` DISABLE KEYS */;
-INSERT INTO `day_book` VALUES (1,1,10.00,'CREDIT','string','2017-03-31','2017-03-31',1,1,NULL),(2,1,10.00,'CREDIT','string','2017-03-31','2017-03-31',1,1,'2017-03-31'),(3,1,1000.00,'CREDIT','string','2017-04-08','2017-04-08',1,1,'2017-04-08'),(4,1,1000.00,'CREDIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(5,1,500.00,'DEBIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(6,1,500.00,'DEBIT','string','2017-04-08','2017-04-08',1,1,'2017-03-31'),(7,1,1010.00,'DEBIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(8,1,1010.00,'DEBIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(9,2,1010.00,'DEBIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(10,3,1010.00,'CREDIT','string','2017-04-08','2017-04-08',1,1,'2017-04-07'),(11,2,200.00,'CREDIT','test','2017-04-08','2017-04-08',1,1,'2017-04-07');
+INSERT INTO `day_book` VALUES (158,5,1000.00,'CREDIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-26'),(159,1,200.00,'CREDIT','cash in hand system generated on Wed Apr 26 22:49:08 IST 2017','2017-04-26','2017-04-26',1,1,'2017-04-26'),(160,5,200.00,'DEBIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-26'),(161,5,500.00,'CREDIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-25'),(162,1,800.00,'CREDIT','cash in hand system generated on Wed Apr 26 22:49:36 IST 2017','2017-04-26','2017-04-26',1,1,'2017-04-25'),(163,5,200.00,'DEBIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-25'),(164,5,100.00,'DEBIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-25'),(165,5,200.00,'DEBIT',NULL,'2017-04-26','2017-04-26',1,1,'2017-04-26');
 /*!40000 ALTER TABLE `day_book` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -179,7 +180,7 @@ CREATE TABLE `user_info` (
 
 LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-INSERT INTO `user_info` VALUES (1,'kumar','$2a$04$FVw/SmaoqZ9yKLau2M2kz.beiD47pgFTW4DD0i4rhPXJOIObkNMAm','kumar','D','2017-04-08',NULL,1);
+INSERT INTO `user_info` VALUES (1,'kumar','$2a$04$FVw/SmaoqZ9yKLau2M2kz.beiD47pgFTW4DD0i4rhPXJOIObkNMAm','kumar','D','2017-04-26',NULL,1);
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -219,4 +220,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-08 20:44:10
+-- Dump completed on 2017-04-27 17:39:29
