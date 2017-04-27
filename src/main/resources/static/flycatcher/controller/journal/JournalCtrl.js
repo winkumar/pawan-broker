@@ -3,14 +3,19 @@
 	angular.module('myApp.journal').controller('JournalCtrl',function($scope, $http, $attrs, $location,$filter) {
 			
 		$scope.journalList = null;
-		$scope.journalSearch = {
-			  startDate : "",
-			  endDate : ""
-		};
+		$scope.setJournalSearchDate = function(){
+			$scope.journalSearch = {
+				  startDate : new Date(),
+				  endDate : new Date()
+			}
+		}
+		
 		$scope.reportStartDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.reportEndDate=$filter('date')(new Date(),'dd-MM-yyyy'); 
     	$scope.todayDate = $filter('date')(new Date(),'dd-MM-yyyy'); 
+    	
 		$scope.init = function(){
+			$scope.setJournalSearchDate();
 			$scope.getJournal('/api/v1/journals?sort=ASC');
 		};
 		
@@ -36,6 +41,9 @@
 	    
 	    $scope.search = function(journalSearch){
 	    	var url = '/api/v1/journals?sort=ASC';
+	    	if(journalSearch === null || journalSearch === undefined){
+	    		$scope.getJournal(url);
+	    	}else{
 	    	if(journalSearch.startDate){
 	    		url +="&startDate="+ $filter('date')(journalSearch.startDate,'dd-MM-yyyy'); 
 	    		$scope.reportStartDate=$filter('date')(journalSearch.startDate,'dd-MM-yyyy'); 
@@ -45,7 +53,7 @@
 	    		$scope.reportEndDate=$filter('date')(journalSearch.endDate,'dd-MM-yyyy'); 
 	    	}
 	    	$scope.getJournal(url);
-	    };
+	    }};
 	    
 	    $scope.exportData = function (journalSearch) {
 	        var blob = new Blob([document.getElementById('tableContent').innerHTML], {
@@ -53,5 +61,10 @@
 	        });
 	        saveAs(blob, "JournalReport-"+$scope.todayDate+".xls");
 	    };
+	    
+	    $scope.clearsearch = function() {
+	    	$scope.setJournalSearchDate();
+	        $scope.search(null);
+	     }; 
 	});
 }());

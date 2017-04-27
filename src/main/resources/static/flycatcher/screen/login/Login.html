@@ -8,7 +8,7 @@
 				</div>
 				<div class="panel-body">
 					<div>
-						<form class="form-horizontal" name="myform" id="myform">
+						<form class="form-horizontal" name="myform" id="myform" ng-submit="login()">
 							<div class="form-group">
 								<label class="col-sm-4 label_right">User Name</label>
 								<div class="col-sm-8">
@@ -36,14 +36,12 @@
 							</div>
 							<div class="form-group ">
 								<div class="col-sm-4">
-									<button type="button" class="btn btn-primary pull-right"
-										ng-click="login()">Save</button>
+									<input type="submit" class="btn btn-primary pull-right" value="Save"/>
 								</div>
 								<div class="col-sm-4">
 									<button type="button" class="btn btn-primary">Cancel</button>
 								</div>
 							</div>
-							
 						</form>
 					</div>
 				</div>
