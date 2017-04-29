@@ -22,7 +22,8 @@
 			</div>
 			<div class="form-group">
 				<span class="col-sm-3"></span>
-				<button type="button" class="btn btn-primary" ng-click="clearsearch()">Cancel</button>
+				<button type="button" class="btn btn-primary"
+					ng-click="clearsearch()">Cancel</button>
 				<button type="button" class="btn btn-primary"
 					ng-disabled='myform.$invalid' ng-click="search(daybookSearch)">Search</button>
 				<button type="button" class="btn btn-primary"
@@ -30,7 +31,7 @@
 				<button type="button" class="btn btn-primary" ng-click="hide(false)">Back</button>
 			</div>
 			<div>
-				<table class="table table-striped table-bordered"
+				<table class="table table-bordered"
 					style="font-size: 13px;">
 					<thead>
 						<tr>
@@ -42,20 +43,23 @@
 							<th>Debit</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr ng-repeat="book in dayBookSearchList.transactions">
-						   <td ng-bind="book.transactionDate | date :'dd-MM-yyyy'"></td>
-						   <td ng-bind="book.accountNumber"></td>
-						   <td ng-bind="book.accountName"></td>
-						   <td ng-bind="book.transactionDesc"></td>
-						   <td class='label_right' ng-bind="book.transactionType == 'CREDIT' ? book.transactionAmount :''"></td>
-						   <td class='label_right'  ng-bind="book.transactionType == 'DEBIT' ? book.transactionAmount : ''"></td>
+					<tbody ng-repeat='cash in cashBookSearchList'>
+							
+						<tr ng-repeat="eachEntry in cash.transactions">
+							<td ng-bind='eachEntry.transactionDate'></td>
+							<td ng-bind='eachEntry.accountNumber'></td>
+							<td ng-bind='eachEntry.accountName'></td>
+							<td ng-bind='eachEntry.transactionDesc'></td>
+							<td
+								ng-bind="eachEntry.transactionType == 'CREDIT' ? eachEntry.transactionAmount :''"></td>
+							<td
+								ng-bind="eachEntry.transactionType == 'DEBIT' ? eachEntry.transactionAmount : ''"></td>
 						</tr>
-						<tr>
-						 <td colspan="2"> <b>Balance : <span ng-bind='dayBookSearchList.balance'></span></b></td>
-						 <td class='label_right' colspan="2"> Total:</span></td>
-						 <td class='label_right' ng-bind="dayBookSearchList.credit"></td>
-						 <td class='label_right' ng-bind="dayBookSearchList.debit"></td>
+						<tr ng-if='cash.balance > 0' style='font-weight: bold;'>
+							<td colspan='4' style='font-size: 14px;' class='label_right'>
+							Balance : <span ng-bind='cash.balance'></span>
+							</td>
+							<td colspan='2'></td>
 						</tr>
 					</tbody>
 				</table>
@@ -64,5 +68,5 @@
 	</div>
 	<div id='daybookContent' ng-hide='true'>
 		<div ng-include="'/flycatcher/screen/dayBook/daybook.report.html'"></div>
-	</div>	
+	</div>
 </div>

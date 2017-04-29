@@ -149,15 +149,15 @@
 	   $scope.hide = function(val){
 		   $scope.dayBookView = val;
 		   $scope.search(null);
-	   } 
-	   
-	   $scope.daybookList = function(url){
+	   }; 
+
+	   $scope.cashbookList = function(url){
 		   $http({
 	    	    method: 'GET',
 	    	    url: url,
 	    	    headers: {'Content-Type': 'application/json'}
 	    	}).success(function(data, status, headers, config){
-	    		$scope.dayBookSearchList = data;
+	    		$scope.cashBookSearchList = data.cashBooks;
 	    	}).error(function(data, status, headers, config){
 	    		$scope.errormessage = data.message;
 	    	});
@@ -165,9 +165,9 @@
 	   
 	   
 	    $scope.search = function(data){
-	    	var url = "/api/v1/dayBooks/all?sort=ASC";
+	    	var url = "/api/v1/cashBooks?sort=ASC";
 	    	if(data == null || data == undefined){
-	    		$scope.daybookList(url);
+	    		return null;
 	    	}else{
 	    	if(data.startDate){
 	    		url +="&startDate="+ $filter('date')(data.startDate,'dd-MM-yyyy'); 
@@ -177,7 +177,7 @@
 	    		url +="&endDate="+ $filter('date')(data.endDate,'dd-MM-yyyy'); 
 	    		$scope.reportEndDate=$filter('date')(data.endDate,'dd-MM-yyyy'); 
 	    	}
-	    	 $scope.daybookList(url);
+	    	$scope.cashbookList(url);
 	    	}
 	    };
 	    

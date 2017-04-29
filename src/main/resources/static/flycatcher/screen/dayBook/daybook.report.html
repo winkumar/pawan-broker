@@ -15,8 +15,6 @@
 					Daybook Report For {{reportStartDate}} to {{reportEndDate}}</th>
 				<th colspan='2' style='text-align: left; background-color: #337ab7;'>Date:{{todayDate}}</th>
 			</tr>
-		</thead>
-		<tbody>
 			<tr>
 				<th>Date</th>
 				<th>Account No</th>
@@ -24,21 +22,21 @@
 				<th>Credit</th>
 				<th>Debit</th>
 			</tr>
-			<tr ng-repeat="book in dayBookSearchList.transactions">
-				<td ng-bind="book.transactionDate | date :'dd-MM-yyyy'"></td>
-				<td ng-bind="book.accountNumber"></td>
-				<td ng-bind="book.accountName"></td>
-				<td class='label_right'
-					ng-bind="book.transactionType == 'CREDIT' ? book.transactionAmount :''"></td>
-				<td class='label_right'
-					ng-bind="book.transactionType == 'DEBIT' ? book.transactionAmount : ''"></td>
+		</thead>
+		<tbody ng-repeat='cash in cashBookSearchList'>
+
+			<tr ng-repeat="eachEntry in cash.transactions">
+				<td ng-bind='eachEntry.transactionDate'></td>
+				<td ng-bind='eachEntry.accountNumber'></td>
+				<td ng-bind='eachEntry.accountName'></td>
+				<td
+					ng-bind="eachEntry.transactionType == 'CREDIT' ? eachEntry.transactionAmount :''"></td>
+				<td
+					ng-bind="eachEntry.transactionType == 'DEBIT' ? eachEntry.transactionAmount : ''"></td>
 			</tr>
-			<tr>
-				<td colspan="2"><b>Balance : <span
-						ng-bind='dayBookSearchList.balance'></span></b></td>
-				<td style="text-align: right;">Total:</span></td>
-				<td ng-bind="dayBookSearchList.credit"></td>
-				<td ng-bind="dayBookSearchList.debit"></td>
+			<tr ng-if='cash.balance > 0' style='font-weight: bold;'>
+				<td colspan='3' style='font-size: 14px; text-align:right;'>Balance : <span ng-bind='cash.balance'></span></td>
+				<td colspan='2'></td>
 			</tr>
 		</tbody>
 	</table>
