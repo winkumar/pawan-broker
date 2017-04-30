@@ -602,7 +602,7 @@ public class DayBookRestController extends AbstractRestHandler{
 				LOGGER.info("--- daybook is empty ---");
 				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
 				LOGGER.info("--- date -1 with value -> {} ---",minusDate);
-				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), account, sort);
+				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), sort);
 				if(previousDayTransactions.isEmpty()){
 					LOGGER.info("--- privious day transactions is empty ---");
 					DayBook newDayBook=new DayBook();
@@ -636,7 +636,7 @@ public class DayBookRestController extends AbstractRestHandler{
 					DayBook newDayBook=new DayBook();
 					
 					balance=creditAmount-debitAmount;
-					if(balance<=0)
+					if(balance<0)
 						newDayBook.setTransactionType(TransactionType.DEBIT);
 					else
 						newDayBook.setTransactionType(TransactionType.CREDIT);
@@ -654,7 +654,7 @@ public class DayBookRestController extends AbstractRestHandler{
 					newDayBook.setTransactionDesc("cash in hand system generated on "+new Date());
 					
 					DayBook createdDayBook=this.dayBookService.createOrUpdateDayBook(newDayBook);
-										
+					LOGGER.info("--- created day book object -> {} ---",createdDayBook);					
 					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
 					Date plusDate;
 					if(dateDifference){
@@ -691,7 +691,7 @@ public class DayBookRestController extends AbstractRestHandler{
 			if(dayBooks.isEmpty()){
 				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
 				LOGGER.info("--- minus one day from the transaction date -> {} , minus Date -> {} ---",dayBook.getTransactionDate(),minusDate);
-				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), account, sort);
+				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), sort);
 				LOGGER.info("--- Pervious transactions -> {} ---",previousDayTransactions);
 				if(previousDayTransactions.isEmpty()){
 					LOGGER.info("--- previous transactions is empty  ---");
@@ -738,23 +738,26 @@ public class DayBookRestController extends AbstractRestHandler{
 					Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
 					
 					for(DayBook transaction: previousDayTransactions){
-				
+						LOGGER.info("--- hello ---");
 						if(TransactionType.CREDIT.equals(transaction.getTransactionType())){
+							LOGGER.info("--- true ---");
 								creditAmount+=transaction.getTransactionAmount()!=null?transaction.getTransactionAmount():0.0;
 						}else{
+							LOGGER.info("--- false ---");
 								debitAmount+=transaction.getTransactionAmount()!=null?transaction.getTransactionAmount():0.0;
 						}
 					}
 					
+					LOGGER.info("--- credit amount -> {} , debit amount -> {} , balance -> {} ---",creditAmount,debitAmount,balance);
 					DayBook newDayBook=new DayBook();
 					
 					balance=creditAmount-debitAmount;
-					if(balance<=0)
+					if(balance<0)
 						newDayBook.setTransactionType(TransactionType.DEBIT);
 					else
 						newDayBook.setTransactionType(TransactionType.CREDIT);
 							
-					
+					LOGGER.info("--- Balance Amount -> {} ---",balance);
 					newDayBook.setAccount(account);
 					newDayBook.setCreatedBy(createdBy);
 					newDayBook.setModifiedBy(createdBy);
