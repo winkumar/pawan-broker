@@ -431,7 +431,7 @@ public class DayBookRestController extends AbstractRestHandler{
 		
 		//call and update cash in hand
 		try {
-			checkAndUpdateCashInHand(createdDayBook,createdDayBook,createdBy);
+			checkAndUpdateCashInHand(createdDayBook,createdDayBook,createdBy,false);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
@@ -501,7 +501,19 @@ public class DayBookRestController extends AbstractRestHandler{
 			throw new ResourceNotFoundException("account doesn't exist's ...!");
 		}
 		
-		DayBook dupDayBook=dayBook;
+		DayBook dupDayBook=new DayBook();
+		dupDayBook.setAccount(dayBook.getAccount());
+		dupDayBook.setCreatedBy(dayBook.getCreatedBy());
+		dupDayBook.setModifiedBy(dayBook.getModifiedBy());
+		dupDayBook.setModifiedDate(dayBook.getModifiedDate());
+		dupDayBook.setCreatedDate(dayBook.getCreatedDate());
+		dupDayBook.setTransactionDate(dayBook.getTransactionDate());
+		dupDayBook.setTransactionAmount(dayBook.getTransactionAmount());
+		dupDayBook.setTransactionType(dayBook.getTransactionType());
+		
+		dupDayBook.setTransactionDesc(dayBook.getTransactionDesc());
+		
+				
 		
 		if(dayBookInfo.getTransactionDate()==null){
 			dayBookInfo.setTransactionDate(new Date());
@@ -534,7 +546,7 @@ public class DayBookRestController extends AbstractRestHandler{
 		
 		//call and update cash in hand
 		try {
-			checkAndUpdateCashInHand(dupDayBook,createdDayBook,createdBy);
+			checkAndUpdateCashInHand(dupDayBook,createdDayBook,createdBy,true);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
@@ -572,6 +584,557 @@ public class DayBookRestController extends AbstractRestHandler{
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
+	
+	
+	
+	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy,Boolean isUpdateTime) throws ParseException{
+		LOGGER.info("---- Inside cash in hand checking and create or update ----");
+		
+		Sort sort=new Sort(Sort.DEFAULT_DIRECTION,"transactionDate");
+		Account account=this.accountService.getAccountById(Long.valueOf(1));
+		
+		
+		SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
+		String tranDateString=simpleDateFormat.format(dayBook.getTransactionDate());
+		String currentDateString=simpleDateFormat.format(new Date());
+		LOGGER.info("--- transaction date -> {} , current date -> {} ---",tranDateString,currentDateString);
+		Date tranDate = simpleDateFormat.parse(tranDateString);
+		Date currentDate = simpleDateFormat.parse(currentDateString);
+		
+		
+		//1. check today cash in hand exist's.
+		//2. if not exist's get previous day transactions do calculation "cash in hand".
+		//3. get next days cash in hand transactions and modify it.
+		
+		
+		LOGGER.info("--- old daybook -> {}  ---",oldDayBook);
+		LOGGER.info("--- new daybook -> {}  ---",dayBook);
+		
+		
+		Double difference=0.0;
+		if(dayBook.getTransactionAmount()<0){
+			difference=oldDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+		}else{
+			if(oldDayBook.getTransactionAmount()<0){
+				difference=dayBook.getTransactionAmount()-oldDayBook.getTransactionAmount();
+			}else{
+				difference=oldDayBook.getTransactionAmount()-dayBook.getTransactionAmount();
+			}
+		}
+
+		LOGGER.info("--- difference amount -> {} ---",difference);
+		
+		List<DayBook> todayCashInHands=this.dayBookService.getDayBooks(new Timestamp(tranDate.getTime()),new Timestamp(tranDate.getTime()), account, sort);
+		
+		if(todayCashInHands.isEmpty()){
+			LOGGER.info("--- today cash in hand is empty , create new ---");
+			//boolean isAvailable=false;
+			Double previousCashInHand=0.0;
+			for(int i=1;i<=5;i++){
+				
+				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),-i);
+				LOGGER.info("--- find previous day transaction -> {} , minusDate -> {} ---",i ,minusDate );
+				List<DayBook> previousCashInHands=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), account, sort);
+				if(!previousCashInHands.isEmpty()){
+					//isAvailable=true;
+					previousCashInHand=previousCashInHands.get(0).getTransactionAmount();
+					break;
+				}
+			}
+			
+			LOGGER.info("--- previous cash in hand -> {} ,  dayBook -> {} ---",previousCashInHand,dayBook);
+					
+			DayBook newDayBook=new DayBook();
+			newDayBook.setAccount(account);
+			newDayBook.setCreatedBy(createdBy);
+			newDayBook.setModifiedBy(createdBy);
+			newDayBook.setModifiedDate(new Date());
+			newDayBook.setCreatedDate(new Date());
+			newDayBook.setTransactionDate(dayBook.getTransactionDate());
+			newDayBook.setTransactionType(TransactionType.CREDIT);					
+			
+			if(TransactionType.CREDIT==dayBook.getTransactionType()){
+				LOGGER.info("--- transaction type credit true ---");
+					if(isUpdateTime)
+						newDayBook.setTransactionAmount(difference+previousCashInHand);
+					else
+						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()+previousCashInHand);
+			}else{
+				LOGGER.info("--- transaction type debit true ---");
+				if(previousCashInHand<dayBook.getTransactionAmount()){
+					if(isUpdateTime)
+						newDayBook.setTransactionAmount(previousCashInHand-difference);
+					else
+						newDayBook.setTransactionAmount(previousCashInHand-dayBook.getTransactionAmount());
+				}else{
+					if(isUpdateTime)
+						newDayBook.setTransactionAmount(previousCashInHand-difference);
+					else
+						newDayBook.setTransactionAmount(previousCashInHand-dayBook.getTransactionAmount());
+				}
+					
+			}
+						
+			newDayBook.setTransactionDesc("cash in hand system generated on "+new Date());
+			
+			this.dayBookService.createOrUpdateDayBook(newDayBook);
+			LOGGER.info("--- new daybook  ---");
+		}else{
+			LOGGER.info("--- get today cash in hand ---");
+			DayBook cashInHand=todayCashInHands.get(0);
+			if(cashInHand!=null){
+				LOGGER.info("--- today cash in hand amount is not empty ---");
+				
+				if(dayBook.getTransactionType()==TransactionType.CREDIT){
+					if(isUpdateTime)
+						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+difference);
+					else
+						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+dayBook.getTransactionAmount());
+				}else{
+					if(isUpdateTime)
+						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()-difference);
+					else
+						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()-dayBook.getTransactionAmount());
+				}
+				
+				cashInHand.setTransactionDesc("cash in hand system  update update on "+new Date());
+				
+				this.dayBookService.createOrUpdateDayBook(cashInHand);	
+			}else{
+				LOGGER.info("--- cash in hand is empty ---");
+			}
+		}
+		
+		
+		boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
+		Date plusDate;
+		if(dateDifference){
+			plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 1);
+		}else{
+			plusDate=getMinusOrPlusDate(dayBook.getTransactionDate(), 1);
+		}
+		
+		
+		List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(currentDate.getTime()), account, sort);
+		LOGGER.info("--- nextTransactions -> {} ---",nextTransactions);
+		for(DayBook transaction:nextTransactions){
+			Double balance=0.0;
+			if(transaction.getTransactionAmount()<=0){
+				if(difference<=0){
+					if(dayBook.getTransactionType()==TransactionType.DEBIT){
+						if(transaction.getTransactionAmount()<difference){
+							if(isUpdateTime)
+								balance=difference-transaction.getTransactionAmount();
+							else
+								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+						}else{
+							if(isUpdateTime)
+								balance=transaction.getTransactionAmount()-difference;
+							else
+								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+						}
+					}else{
+						if(isUpdateTime)
+							balance=transaction.getTransactionAmount()+difference;
+						else
+							balance=transaction.getTransactionAmount()+dayBook.getTransactionAmount();
+					}
+				}else{
+					if(dayBook.getTransactionType()==TransactionType.DEBIT){
+					if(transaction.getTransactionAmount()<difference){
+							if(isUpdateTime)
+								balance=difference-transaction.getTransactionAmount();
+							else
+								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+					}else{
+							if(isUpdateTime){
+								balance=transaction.getTransactionAmount()-difference;
+							}else{
+								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+							}
+						}
+					}else{
+						if(isUpdateTime)
+							balance=difference+transaction.getTransactionAmount();
+						else
+							balance=dayBook.getTransactionAmount()+transaction.getTransactionAmount();
+					}
+				}
+			}else{
+				if(difference<=0){
+					if(dayBook.getTransactionType()==TransactionType.DEBIT){
+						if(transaction.getTransactionAmount()<difference){
+							if(isUpdateTime){
+								balance=difference-transaction.getTransactionAmount();
+							}else{
+								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+							}
+						}else{
+							if(isUpdateTime){
+								balance=transaction.getTransactionAmount()-difference;
+							}else{
+								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+							}
+						}
+					}else{
+						if(isUpdateTime)
+							balance=transaction.getTransactionAmount()+difference;
+						else
+							balance=transaction.getTransactionAmount()+dayBook.getTransactionAmount();
+					}
+				}else{
+					if(dayBook.getTransactionType()==TransactionType.DEBIT){
+						if(transaction.getTransactionAmount()<difference){
+							if(isUpdateTime)
+								balance=difference-transaction.getTransactionAmount();
+							else
+								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+						}else{
+							if(isUpdateTime)
+								balance=transaction.getTransactionAmount()-difference;
+							else
+								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+						}
+					
+					}else{
+						if(isUpdateTime)
+							balance=difference+transaction.getTransactionAmount();
+						else
+							balance=dayBook.getTransactionAmount()+transaction.getTransactionAmount();
+					}
+				}
+			}
+			
+			transaction.setTransactionAmount(balance);
+								
+			this.dayBookService.createOrUpdateDayBook(transaction);
+		}
+		
+		
+/*        		
+		if(tranDate.equals(currentDate)){
+			LOGGER.info("--- transaction and today date is equal ---");
+			List<DayBook> dayBooks=this.dayBookService.getDayBooks(new Timestamp(dayBook.getTransactionDate().getTime()),new Timestamp(dayBook.getTransactionDate().getTime()), account, sort);
+			if(dayBooks.isEmpty()){
+				LOGGER.info("--- daybook is empty ---");
+				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),0);
+				LOGGER.info("--- date get transactions -> {} ---",minusDate);
+				List<DayBook> cashInHandTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()),account, sort);
+				LOGGER.info("--- today cash in hand transactions -> {} ---",cashInHandTransactions);
+				if(cashInHandTransactions.isEmpty()){
+					LOGGER.info("--- today cash in hand transactions is empty ---");
+					Double bal=0.0;
+					Boolean isCredit=true;
+					Date minus1Date=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+					List<DayBook> lastCashHandTransactions=this.dayBookService.getDayBooks(new Timestamp(minus1Date.getTime()),new Timestamp(minus1Date.getTime()),account, sort);
+					if(!lastCashHandTransactions.isEmpty()){
+						bal=lastCashHandTransactions.get(0).getTransactionAmount();
+						
+						if(TransactionType.DEBIT.equals(lastCashHandTransactions.get(0).getTransactionType()))
+							isCredit=false;
+					}
+										
+					DayBook newDayBook=new DayBook();
+					newDayBook.setAccount(account);
+					newDayBook.setCreatedBy(createdBy);
+					newDayBook.setModifiedBy(createdBy);
+					newDayBook.setModifiedDate(new Date());
+					newDayBook.setCreatedDate(new Date());
+					newDayBook.setTransactionDate(dayBook.getTransactionDate());
+										
+					
+					if(isCredit){
+						newDayBook.setTransactionType(TransactionType.CREDIT);
+						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()+bal);
+					}else{
+						newDayBook.setTransactionType(TransactionType.DEBIT);
+						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()-bal);
+					}
+					
+					newDayBook.setTransactionDesc("cash in hand system generated on "+new Date());
+					
+					this.dayBookService.createOrUpdateDayBook(newDayBook);
+				}else{
+					LOGGER.info("--- today  cash in hand transactions is not empty ---");
+								
+					DayBook dayBookObject=cashInHandTransactions.get(0);
+					
+					Double bal=0.0;
+					Boolean isCredit=true;
+					Date minus1Date=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+					List<DayBook> lastCashHandTransactions=this.dayBookService.getDayBooks(new Timestamp(minus1Date.getTime()),new Timestamp(minus1Date.getTime()),account, sort);
+					if(!lastCashHandTransactions.isEmpty()){
+						bal=lastCashHandTransactions.get(0).getTransactionAmount();
+						
+						if(TransactionType.DEBIT.equals(lastCashHandTransactions.get(0).getTransactionType()))
+							isCredit=false;
+					}
+					
+					if(isCredit){
+						dayBookObject.setTransactionType(TransactionType.CREDIT);
+						dayBookObject.setTransactionAmount(dayBook.getTransactionAmount()+bal);
+					}else{
+						dayBookObject.setTransactionType(TransactionType.DEBIT);
+						dayBookObject.setTransactionAmount(dayBook.getTransactionAmount()-bal);
+					}
+					
+					DayBook createdDayBook=this.dayBookService.createOrUpdateDayBook(dayBookObject);
+					
+					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
+					Date plusDate;
+					if(dateDifference){
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
+					}else{
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
+					}
+					
+					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
+					
+					boolean isCreditCHeck=false;
+					if(createdDayBook.getTransactionType().equals(TransactionType.CREDIT))
+						isCreditCHeck=true;
+					
+					for(DayBook transaction:nextTransactions){
+						
+						if(isCreditCHeck)
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()+oldDayBook.getTransactionAmount()));
+						else
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()-oldDayBook.getTransactionAmount()));
+						
+						this.dayBookService.createOrUpdateDayBook(transaction);
+					}
+
+				}
+			}else{
+				LOGGER.info("--- block-1 cash in hand already exist's ---");
+			}
+		//}else if(dateCompare<0){
+		}else if(tranDate.before(currentDate)){
+			LOGGER.info("--- transaction date before today ---");
+			List<DayBook> dayBooks=this.dayBookService.getDayBooks(new Timestamp(dayBook.getTransactionDate().getTime()),new Timestamp(dayBook.getTransactionDate().getTime()), account, sort);
+			LOGGER.info("---- dayBooks -> {} ----",dayBooks);
+			if(dayBooks.isEmpty()){
+				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),0);
+				LOGGER.info("--- minus one day from the transaction date -> {} , minus Date -> {} ---",dayBook.getTransactionDate(),minusDate);
+				List<DayBook> toDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()),account, sort);
+				LOGGER.info("--- today transactions -> {} ---",toDayTransactions);
+				if(toDayTransactions.isEmpty()){
+					LOGGER.info("--- previous transactions is empty  ---");
+					LOGGER.info("---- dayBook -> {}  ----",dayBook);
+					LOGGER.info("---- newDayBook -> {} ---",oldDayBook);
+					Double bal=0.0;
+					Boolean isCredit=true;
+					Date minus1Date=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+					List<DayBook> lastCashHandTransactions=this.dayBookService.getDayBooks(new Timestamp(minus1Date.getTime()),new Timestamp(minus1Date.getTime()),account, sort);
+					if(!lastCashHandTransactions.isEmpty()){
+						bal=lastCashHandTransactions.get(0).getTransactionAmount();
+						
+						if(TransactionType.DEBIT.equals(lastCashHandTransactions.get(0).getTransactionType()))
+							isCredit=false;
+					}
+					
+					
+					DayBook newDayBook=new DayBook();
+					newDayBook.setAccount(account);
+					newDayBook.setCreatedBy(createdBy);
+					newDayBook.setModifiedBy(createdBy);
+					newDayBook.setModifiedDate(new Date());
+					newDayBook.setCreatedDate(new Date());
+					newDayBook.setTransactionDate(dayBook.getTransactionDate());
+										
+					
+					if(isCredit){
+						newDayBook.setTransactionType(TransactionType.CREDIT);
+						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()+bal);
+					}else{
+						newDayBook.setTransactionType(TransactionType.DEBIT);
+						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()-bal);
+					}
+					
+					newDayBook.setTransactionDesc("cash in hand system generated on "+new Date());
+					
+					DayBook createdDayBook=this.dayBookService.createOrUpdateDayBook(newDayBook);
+			
+					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
+					Date plusDate;
+					if(dateDifference){
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
+					}else{
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
+					}
+					
+					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
+					
+					boolean isCreditCheck=false;
+					if(createdDayBook.getTransactionType().equals(TransactionType.CREDIT))
+						isCredit=true;
+					
+					for(DayBook transaction:nextTransactions){
+						if(isCreditCheck)
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()+oldDayBook.getTransactionAmount()));
+						else
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()-oldDayBook.getTransactionAmount()));
+						
+						this.dayBookService.createOrUpdateDayBook(transaction);
+					}
+
+				}else{
+					LOGGER.info("--- previous transactions is not empty  ---");
+										
+					DayBook dayBookObject=toDayTransactions.get(0);
+					
+					Double bal=0.0;
+					Boolean isCredit=true;
+					Date minus1Date=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+					List<DayBook> lastCashHandTransactions=this.dayBookService.getDayBooks(new Timestamp(minus1Date.getTime()),new Timestamp(minus1Date.getTime()),account, sort);
+					if(!lastCashHandTransactions.isEmpty()){
+						bal=lastCashHandTransactions.get(0).getTransactionAmount();
+						
+						if(TransactionType.DEBIT.equals(lastCashHandTransactions.get(0).getTransactionType()))
+							isCredit=false;
+					}
+					
+					if(isCredit){
+						dayBookObject.setTransactionType(TransactionType.CREDIT);
+						dayBookObject.setTransactionAmount(dayBook.getTransactionAmount()+bal);
+					}else{
+						dayBookObject.setTransactionType(TransactionType.DEBIT);
+						dayBookObject.setTransactionAmount(dayBook.getTransactionAmount()-bal);
+					}
+					
+					DayBook createdDayBook=this.dayBookService.createOrUpdateDayBook(dayBookObject);
+
+					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
+					Date plusDate;
+					if(dateDifference){
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
+					}else{
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
+					}
+					
+					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
+					
+					boolean isCreditCheck=false;
+					if(createdDayBook.getTransactionType().equals(TransactionType.CREDIT))
+						isCredit=true;
+					
+					for(DayBook transaction:nextTransactions){
+						
+						if(isCreditCheck)
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()+oldDayBook.getTransactionAmount()));
+						else
+							transaction.setTransactionAmount(Math.abs(transaction.getTransactionAmount()-oldDayBook.getTransactionAmount()));
+						
+						
+						this.dayBookService.createOrUpdateDayBook(transaction);
+					}
+					
+					
+				}
+			}else{
+				LOGGER.info("--- cash in hand transaction going to update ---");
+				
+				DayBook modifiedDayBook=dayBooks.get(0);
+				LOGGER.info("--- modified daybook amount -> {} , oldDayBook amount -> {} ---",modifiedDayBook.getTransactionAmount(),oldDayBook.getTransactionAmount());
+				
+				Double difference=0.0;
+				if(dayBook.getTransactionAmount()<0){
+					difference=modifiedDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+				}else{
+					if(modifiedDayBook.getTransactionAmount()<0){
+						difference=dayBook.getTransactionAmount()-modifiedDayBook.getTransactionAmount();
+					}else{
+						difference=modifiedDayBook.getTransactionAmount()-dayBook.getTransactionAmount();
+					}
+					//dayBook.getTransactionAmount()
+				}
+											
+				modifiedDayBook.setTransactionAmount(difference);
+				
+				DayBook modifiedDifferenceDayBook=this.dayBookService.createOrUpdateDayBook(modifiedDayBook);
+							
+								
+				String oldTranDateString=simpleDateFormat.format(dayBook.getTransactionDate());
+				String newTrantDateString=simpleDateFormat.format(oldDayBook.getTransactionDate());
+				LOGGER.info("--- old transaction date -> {} , new transation date -> {} ---",oldTranDateString,newTrantDateString);
+				Date oldTranDate = simpleDateFormat.parse(oldTranDateString);
+				Date newTranDate = simpleDateFormat.parse(newTrantDateString);
+				int dateDifference=oldTranDate.compareTo(newTranDate);
+				Date plusDate;
+				if(dateDifference<=0){
+					LOGGER.info("--- minus from old transaction date ---");
+					plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
+					
+				}else{
+					LOGGER.info("--- minus from new transaction date ---");
+					plusDate=getMinusOrPlusDate(modifiedDayBook.getTransactionDate(), 0);
+				}
+							
+				LOGGER.info("--- after plus date -> {} ---",plusDate);
+				
+				List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
+				LOGGER.info("--- nextTransactions -> {} ---",nextTransactions);
+				for(DayBook transaction:nextTransactions){
+					Double balance=0.0;
+					if(transaction.getTransactionAmount()<=0){
+						if(difference<=0){
+							if(dayBook.getTransactionType().equals(TransactionType.DEBIT)){
+								if(transaction.getTransactionAmount()<difference)
+									balance=difference-transaction.getTransactionAmount();
+								else
+									balance=transaction.getTransactionAmount()-difference;
+							}else{
+								balance=transaction.getTransactionAmount()+difference;
+							}
+						}else{
+							if(dayBook.getTransactionType().equals(TransactionType.DEBIT))
+								if(transaction.getTransactionAmount()<difference)
+									balance=difference-transaction.getTransactionAmount();
+								else
+									balance=transaction.getTransactionAmount()-difference;
+							else
+								balance=difference+transaction.getTransactionAmount();
+						}
+					}else{
+						if(difference<=0){
+							if(dayBook.getTransactionType().equals(TransactionType.DEBIT)){
+								if(transaction.getTransactionAmount()<difference)
+									balance=difference-transaction.getTransactionAmount();
+								else
+									balance=transaction.getTransactionAmount()-difference;
+							}else{
+								balance=transaction.getTransactionAmount()+difference;
+							}
+						}else{
+							if(dayBook.getTransactionType().equals(TransactionType.DEBIT)){
+								if(transaction.getTransactionAmount()<difference){
+									balance=difference-transaction.getTransactionAmount();
+								}else{
+									balance=transaction.getTransactionAmount()-difference;
+								}
+							
+							}else{
+								balance=difference+transaction.getTransactionAmount();
+							}
+						}
+					}
+					
+					transaction.setTransactionAmount(balance);
+										
+					this.dayBookService.createOrUpdateDayBook(transaction);
+				}
+				
+			}
+			
+			
+		}else{
+			LOGGER.debug("--- transaction date is not possible to greater than today ---");
+		}*/
+	}
+	
+	
+	
+	
 	/**
 	 * 
 	 * @param oldDayBook
@@ -579,7 +1142,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	 * @param createdBy
 	 * @throws ParseException
 	 */
-	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy) throws ParseException{
+/*	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy) throws ParseException{
 		LOGGER.info("---- Inside cash in hand checking and create or update ----");
 		int dateCompare=dayBook.getTransactionDate().compareTo(new Date());
 		
@@ -600,7 +1163,7 @@ public class DayBookRestController extends AbstractRestHandler{
 			List<DayBook> dayBooks=this.dayBookService.getDayBooks(new Timestamp(dayBook.getTransactionDate().getTime()),new Timestamp(dayBook.getTransactionDate().getTime()), account, sort);
 			if(dayBooks.isEmpty()){
 				LOGGER.info("--- daybook is empty ---");
-				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),0);
 				LOGGER.info("--- date -1 with value -> {} ---",minusDate);
 				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), sort);
 				if(previousDayTransactions.isEmpty()){
@@ -658,9 +1221,9 @@ public class DayBookRestController extends AbstractRestHandler{
 					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
 					Date plusDate;
 					if(dateDifference){
-						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
 					}else{
-						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
 					}
 					
 					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
@@ -689,9 +1252,9 @@ public class DayBookRestController extends AbstractRestHandler{
 			List<DayBook> dayBooks=this.dayBookService.getDayBooks(new Timestamp(dayBook.getTransactionDate().getTime()),new Timestamp(dayBook.getTransactionDate().getTime()), account, sort);
 			LOGGER.info("---- dayBooks -> {} ----",dayBooks);
 			if(dayBooks.isEmpty()){
-				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),-1);
+				Date minusDate=getMinusOrPlusDate(dayBook.getTransactionDate(),0);
 				LOGGER.info("--- minus one day from the transaction date -> {} , minus Date -> {} ---",dayBook.getTransactionDate(),minusDate);
-				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()), sort);
+				List<DayBook> previousDayTransactions=this.dayBookService.getDayBooks(new Timestamp(minusDate.getTime()),new Timestamp(minusDate.getTime()),account, sort);
 				LOGGER.info("--- Pervious transactions -> {} ---",previousDayTransactions);
 				if(previousDayTransactions.isEmpty()){
 					LOGGER.info("--- previous transactions is empty  ---");
@@ -713,9 +1276,9 @@ public class DayBookRestController extends AbstractRestHandler{
 					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
 					Date plusDate;
 					if(dateDifference){
-						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
 					}else{
-						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
 					}
 					
 					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
@@ -773,9 +1336,9 @@ public class DayBookRestController extends AbstractRestHandler{
 					boolean dateDifference=oldDayBook.getTransactionDate().before(dayBook.getTransactionDate());
 					Date plusDate;
 					if(dateDifference){
-						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
 					}else{
-						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 1);
+						plusDate=getMinusOrPlusDate(createdDayBook.getTransactionDate(), 0);
 					}
 					
 					List<DayBook> nextTransactions=this.dayBookService.getDayBooks(new Timestamp(plusDate.getTime()),new Timestamp(new Date().getTime()), account, sort);
@@ -815,10 +1378,10 @@ public class DayBookRestController extends AbstractRestHandler{
 					//dayBook.getTransactionAmount()
 				}
 											
-				/*modifiedDayBook.setTransactionAmount(difference);
+				modifiedDayBook.setTransactionAmount(difference);
 				
 				DayBook modifiedDifferenceDayBook=this.dayBookService.createOrUpdateDayBook(modifiedDayBook);
-		*/					
+							
 								
 				String oldTranDateString=simpleDateFormat.format(dayBook.getTransactionDate());
 				String newTrantDateString=simpleDateFormat.format(oldDayBook.getTransactionDate());
@@ -829,11 +1392,11 @@ public class DayBookRestController extends AbstractRestHandler{
 				Date plusDate;
 				if(dateDifference<=0){
 					LOGGER.info("--- minus from old transaction date ---");
-					plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 1);
+					plusDate=getMinusOrPlusDate(oldDayBook.getTransactionDate(), 0);
 					
 				}else{
 					LOGGER.info("--- minus from new transaction date ---");
-					plusDate=getMinusOrPlusDate(modifiedDayBook.getTransactionDate(), 1);
+					plusDate=getMinusOrPlusDate(modifiedDayBook.getTransactionDate(), 0);
 				}
 							
 				LOGGER.info("--- after plus date -> {} ---",plusDate);
@@ -896,7 +1459,7 @@ public class DayBookRestController extends AbstractRestHandler{
 		}else{
 			LOGGER.debug("--- transaction date is not possible to greater than today ---");
 		}
-	}
+	}*/
 	
 	
 	private Date getMinusOrPlusDate(Date originalDate,int days){

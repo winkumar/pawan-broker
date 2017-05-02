@@ -145,7 +145,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 					continue;
 					
 				}else{
-					balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate));
+					balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate,false));
 				}
 				
 			}
@@ -178,7 +178,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 				
 				balanceSheetInfos.add(balanceSheetInfo);*/
 			}else{
-				balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate));
+				balanceSheetInfos.add(balanceSheet(sortDirection, accountType, accounts, startDate, endDate,false));
 			}
 		}
 			
@@ -187,7 +187,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 		if(accountType!=null){
 			Set<Account> accounts=accountType.getAccounts();
 			if(!accounts.isEmpty()){
-				BalanceSheetInfo balanceSheetInfo=balanceSheet(sortDirection, accountType, accounts, startDate, endDate);
+				BalanceSheetInfo balanceSheetInfo=balanceSheet(sortDirection, accountType, accounts, startDate, endDate,true);
 				if(balanceSheetInfo!=null){
 					balanceSheetInfo.setIsPositive(false);
 					
@@ -229,13 +229,17 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 	 * @param endDate
 	 * @return
 	 */
-	private BalanceSheetInfo balanceSheet(final Sort.Direction sortDirection,final AccountType accountType,final Set<Account> accounts,final Date startDate,final Date endDate){
+	private BalanceSheetInfo balanceSheet(final Sort.Direction sortDirection,final AccountType accountType,final Set<Account> accounts,final Date startDate,final Date endDate,final Boolean takeLastRecord){
 				
 		Sort sort=new Sort(sortDirection,"transactionDate");
 		List<DayBook> dayBooks=this.dayBookService.getDayBooks( accounts, new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()),sort);
 				
 		Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
 		if(dayBooks!=null){
+			if(takeLastRecord){
+				DayBook lastDayBook=dayBooks.get(dayBooks.size()-1);
+				creditAmount=lastDayBook.getTransactionAmount();
+			}else{
 			for(DayBook dayBook: dayBooks) {
 					
 				if(TransactionType.CREDIT.equals(dayBook.getTransactionType())){
@@ -243,6 +247,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 				}else{
 					debitAmount+=dayBook.getTransactionAmount()!=null?dayBook.getTransactionAmount():0.0;
 				}
+			}
 			}
 		}
 		
@@ -266,8 +271,6 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 		return balanceSheetInfo;
 	}
 
-	
-	
 }
 
 
