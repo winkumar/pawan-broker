@@ -1,32 +1,41 @@
-<html lang="en" id="ng-app" ng-app='myApp' xmlns:ng="http://angularjs.org">
+<html lang="en" id="ng-app" ng-app='myApp'
+	xmlns:ng="http://angularjs.org">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-     <link href="/flycatcher/lib/bootstrap/css/bootstrap.css" rel="stylesheet"  media="screen" />
-    <link href="/flycatcher/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-    <link href="/flycatcher/lib/bootstrap/fonts/css/font-awesome.min.css" rel="stylesheet" media="screen">
-    <script src="/flycatcher/lib/angular.min.js"></script>
-    <script src="/flycatcher/lib/angular-route.js"></script>
-    <script src="/flycatcher/lib/angular-messages.js"></script>
-    <script src="/flycatcher/lib/angular-cookies.js"></script>
-    <script src="/flycatcher/lib/angular-sanitize.js"></script>
-    <script src="/flycatcher/lib/angular-resource.js"></script>
-    <script src="/flycatcher/lib/angular-idle.js"></script>
-    <script src="/flycatcher/lib/ngStorage.min.js"></script>
-    <script src="/flycatcher/lib/jquery-1.12.4.js"></script>
-    <script src="/flycatcher/lib/FileSaver.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/flycatcher/lib/bootstrap/css/bootstrap.css"
+	rel="stylesheet" media="screen" />
+<link href="/flycatcher/lib/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" media="screen" />
+<link href="/flycatcher/lib/bootstrap/fonts/css/font-awesome.min.css"
+	rel="stylesheet" media="screen">
+<script src="/flycatcher/lib/angular.min.js"></script>
+<script src="/flycatcher/lib/angular-route.js"></script>
+<script src="/flycatcher/lib/angular-messages.js"></script>
+<script src="/flycatcher/lib/angular-cookies.js"></script>
+<script src="/flycatcher/lib/angular-sanitize.js"></script>
+<script src="/flycatcher/lib/angular-resource.js"></script>
+<script src="/flycatcher/lib/angular-idle.js"></script>
+<script src="/flycatcher/lib/ngStorage.min.js"></script>
+<script src="/flycatcher/lib/jquery-1.12.4.js"></script>
+<script src="/flycatcher/lib/FileSaver.js"></script>
 </head>
 
 <body>
-    <div class="container-fluid" ng-view></div>
+	<div id='loading'>
+		<i class="fa fa-spinner fa-spin fa-4x"></i> <br /> 
+		<span>Loading...</span>
+	</div>
+	<div class="container-fluid" ng-view></div>
 </body>
-	<link href="/flycatcher/css/custom.css" rel="stylesheet" media="screen">
-	<link href="/flycatcher/css/css.config.css" rel="stylesheet" media="screen">
-	<script src="/flycatcher/controller/app.js"></script>
-	<script src="/flycatcher/controller/NavCtrl.js"></script>
-    <script src="/flycatcher/controller/account/AccountCtrl.js"></script>
-    <script src="/flycatcher/controller/login/LoginCtrl.js"></script>
-    <script src="/flycatcher/controller/dayBook/DayBookCtrl.js"></script>
-    <script src="/flycatcher/controller/journal/JournalCtrl.js"></script>
-    <script src="/flycatcher/controller/balanceSheet/BalanceSheetCtrl.js"></script>
+<link href="/flycatcher/css/custom.css" rel="stylesheet" media="screen">
+<link href="/flycatcher/css/css.config.css" rel="stylesheet"
+	media="screen">
+<script src="/flycatcher/controller/app.js"></script>
+<script src="/flycatcher/controller/NavCtrl.js"></script>
+<script src="/flycatcher/controller/account/AccountCtrl.js"></script>
+<script src="/flycatcher/controller/login/LoginCtrl.js"></script>
+<script src="/flycatcher/controller/dayBook/DayBookCtrl.js"></script>
+<script src="/flycatcher/controller/journal/JournalCtrl.js"></script>
+<script src="/flycatcher/controller/balanceSheet/BalanceSheetCtrl.js"></script>
 </html>

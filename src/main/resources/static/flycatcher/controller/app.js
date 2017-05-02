@@ -41,7 +41,7 @@ myApp.run(function(Idle,api,$q,$rootScope,$window,$localStorage) {
 	  api.init();
 	  Idle.watch();
 	  $rootScope.$on('IdleTimeout', function(){
-		  //$window.location.href ="/";
+		  $window.location.href ="/";
 	  });
 });
 
@@ -57,8 +57,8 @@ myApp.factory('api', function($http,$localStorage) {
 myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', function ($rootScope, $q, $location, $timeout) {
 	return {
 	    request: function (config) {
-	      delete $rootScope.errorKey;
-	      
+	      $("#loading").hide();	
+	      delete $rootScope.errorKey;	      
 	      if(!/\.html/.test(config.url)) {
 	        var defer = $q.defer();
 	        config.timeout = defer.promise;
@@ -69,6 +69,7 @@ myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', f
 	      var status = response.status;
 	      if(status === 401) {
 	        $timeout(function () {
+	          $("#loading").hide();	
 	          $location.path('/login');
 	        }, 50);
 
