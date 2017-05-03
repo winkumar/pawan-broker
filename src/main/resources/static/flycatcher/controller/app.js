@@ -32,9 +32,9 @@ myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
 });
 
 myApp.config(function(IdleProvider, KeepaliveProvider) {
-	 IdleProvider.idle(5);
-	 IdleProvider.timeout(5);
-	 KeepaliveProvider.interval(10);
+	 IdleProvider.idle(500);
+	 IdleProvider.timeout(500);
+	 KeepaliveProvider.interval(100);
 });
 
 myApp.run(function(Idle,api,$q,$rootScope,$window,$localStorage) {
