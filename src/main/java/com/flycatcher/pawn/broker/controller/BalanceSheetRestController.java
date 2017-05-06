@@ -236,7 +236,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 				
 		Double debitAmount=0.0,creditAmount=0.0,balance=0.0;
 		if(dayBooks!=null){
-			if(takeLastRecord){
+			if(takeLastRecord && !dayBooks.isEmpty()){
 				DayBook lastDayBook=dayBooks.get(dayBooks.size()-1);
 				creditAmount=lastDayBook.getTransactionAmount();
 			}else{

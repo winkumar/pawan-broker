@@ -294,3 +294,19 @@ table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th,
 .redcolor{
 	background-color:red;
 }
+
+#loading {
+	position: fixed;
+	background-color: white;
+	top:0;
+	bottom:0;
+	left : 0;
+	right :0;
+	z-index : 999999;
+	margin:auto;
+    padding: 15px 18px 10px;
+    height:120px;
+    width:100px;
+    border : 1px solid #333;
+    border-radius : 5px;
+}

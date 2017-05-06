@@ -21,7 +21,7 @@ var denpency = [
 
 var myApp = angular.module('myApp',denpency);
 
-myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
+myApp.config(function($routeProvider, $locationProvider,$httpProvider,IdleProvider, KeepaliveProvider) {
   $routeProvider
   	.when('/', {templateUrl: '/flycatcher/screen/login/Login.html'})
     .when('/account', {templateUrl: '/flycatcher/screen/account/account.create.html'})
@@ -29,15 +29,19 @@ myApp.config(function($routeProvider, $locationProvider,$httpProvider) {
     .when('/journalView', {templateUrl: '/flycatcher/screen/journal/journal.view.html'})
     .when('/balanceSheetView', {templateUrl: '/flycatcher/screen/balanceSheet/balance.sheet.html'})
     .otherwise({redirectTo: '/'})
+    
+    $httpProvider.interceptors.push('authInterceptor');
+  	$httpProvider.defaults.transformRequest.push(function(data){
+  		$('#loading').show();
+  		return data;
+  	});
+     
+  	 IdleProvider.idle(900);
+	 IdleProvider.timeout(10);
+	 KeepaliveProvider.interval(3);
 });
 
-myApp.config(function(IdleProvider, KeepaliveProvider) {
-	 IdleProvider.idle(500);
-	 IdleProvider.timeout(500);
-	 KeepaliveProvider.interval(100);
-});
-
-myApp.run(function(Idle,api,$q,$rootScope,$window,$localStorage) {
+myApp.run(function(Idle,api,$q,$rootScope,$window) {
 	  api.init();
 	  Idle.watch();
 	  $rootScope.$on('IdleTimeout', function(){
@@ -54,37 +58,26 @@ myApp.factory('api', function($http,$localStorage) {
 });
 
 
-myApp.factory('authInterceptor', ['$rootScope', '$q', '$location', '$timeout', function ($rootScope, $q, $location, $timeout) {
+myApp.factory('authInterceptor', function ($rootScope, $q, $location,$injector) {
 	return {
 	    request: function (config) {
-	      $("#loading").hide();	
-	      delete $rootScope.errorKey;	      
-	      if(!/\.html/.test(config.url)) {
-	        var defer = $q.defer();
-	        config.timeout = defer.promise;
-	      }
+	      $('#loading').hide();	
+	      var $http = $http || $injector.get('$http');
+		  if($http.pendingRequests.length > 1){
+			  $http.pendingRequests.filter(function(ele,index){
+				  $http.pendingRequests.splice(index,1);
+			  });
+		  }	
 	      return config;
 	    },
+	    response : function(response){
+	      var $http = $http || $injector.get('$http');
+	      if($http.pendingRequests.length < 1)
+	    	$('#loading').hide();
+	     return response;
+	    },
 	    responseError: function (response) {
-	      var status = response.status;
-	      if(status === 401) {
-	        $timeout(function () {
-	          $("#loading").hide();	
-	          $location.path('/login');
-	        }, 50);
-
-	      } else if(status !== 0) {
-	        $rootScope.showErrorMsg = true;
-	        $timeout(function() {
-	          $rootScope.showErrorMsg = false;
-	        }, 200);
-	      }
 	      return $q.reject(response);
 	    }
 	  };
-}]);
-
-myApp.config(['$httpProvider', function($httpProvider) {
-  $httpProvider.interceptors.push('authInterceptor');
-}]);
- 
+});

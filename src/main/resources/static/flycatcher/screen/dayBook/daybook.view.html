@@ -59,7 +59,8 @@
 							<td colspan='4' style='font-size: 14px;' class='label_right'>
 							Balance : <span ng-bind='cash.balance'></span>
 							</td>
-							<td colspan='2'></td>
+							<td><span ng-if="cash.credit" ng-bind="cash.credit"></span></td>
+							<td><span ng-if="cash.debit" ng-bind="cash.debit"></span></td>
 						</tr>
 					</tbody>
 				</table>
