@@ -587,6 +587,15 @@ public class DayBookRestController extends AbstractRestHandler{
 	
 	
 	
+	/**
+	 * Check and Update Cash In Hand
+	 * 
+	 * @param oldDayBook , oldDayBook 
+	 * @param dayBook , newDayBook Object
+	 * @param createdBy , createdBy Object
+	 * @param isUpdateTime , find out update or create
+	 * @throws ParseException
+	 */
 	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy,Boolean isUpdateTime) throws ParseException{
 		LOGGER.info("---- Inside cash in hand checking and create or update ----");
 		
@@ -612,14 +621,46 @@ public class DayBookRestController extends AbstractRestHandler{
 		
 		
 		Double difference=0.0;
-		if(dayBook.getTransactionAmount()<0){
-			difference=oldDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+		if(isUpdateTime){
+			/*if(dayBook.getTransactionAmount()<0){
+				difference=oldDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+			}else{*/
+				if(oldDayBook.getTransactionType()==dayBook.getTransactionType()){
+					difference=dayBook.getTransactionAmount()-oldDayBook.getTransactionAmount();
+				}else{
+					LOGGER.info("--- transaction type is not same ---");
+					if(dayBook.getTransactionType()==TransactionType.CREDIT && oldDayBook.getTransactionType()==TransactionType.DEBIT){
+						LOGGER.info("--- credit daybook transaction type -> {} , oldbook transaction type -> {} ---",dayBook.getTransactionType(),oldDayBook.getTransactionType());
+						if(oldDayBook.getTransactionAmount().equals(dayBook.getTransactionAmount())){
+							difference=oldDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+						}else if(oldDayBook.getTransactionAmount()<dayBook.getTransactionAmount()){
+							difference=dayBook.getTransactionAmount()+oldDayBook.getTransactionAmount();
+						}else{
+							difference=oldDayBook.getTransactionAmount()+dayBook.getTransactionAmount();
+						}
+					}else{
+						LOGGER.info("--- debit daybook transaction type -> {} , oldbook transaction type -> {} ---",dayBook.getTransactionType(),oldDayBook.getTransactionType());
+						LOGGER.info("--- old amount -> {} , new amount -> {} ---",oldDayBook.getTransactionAmount(),dayBook.getTransactionAmount());
+						if(oldDayBook.getTransactionAmount().equals(dayBook.getTransactionAmount())){
+							LOGGER.info("EQUALS");
+							difference=-(dayBook.getTransactionAmount()+oldDayBook.getTransactionAmount());
+						/*}else if(oldDayBook.getTransactionAmount()<dayBook.getTransactionAmount()){
+							LOGGER.info("LESS THAN");
+							difference=oldDayBook.getTransactionAmount()-dayBook.getTransactionAmount();*/
+						}else{
+							LOGGER.info("GREATER THAN");
+							difference=oldDayBook.getTransactionAmount()-dayBook.getTransactionAmount();
+						}
+						
+					}
+				}
+				
+			//}
 		}else{
-			if(oldDayBook.getTransactionAmount()<0){
-				difference=dayBook.getTransactionAmount()-oldDayBook.getTransactionAmount();
-			}else{
-				difference=oldDayBook.getTransactionAmount()-dayBook.getTransactionAmount();
-			}
+			if(dayBook.getTransactionType()==TransactionType.DEBIT)
+				difference=-dayBook.getTransactionAmount();
+			else
+				difference=dayBook.getTransactionAmount();
 		}
 
 		LOGGER.info("--- difference amount -> {} ---",difference);
@@ -655,22 +696,13 @@ public class DayBookRestController extends AbstractRestHandler{
 			
 			if(TransactionType.CREDIT==dayBook.getTransactionType()){
 				LOGGER.info("--- transaction type credit true ---");
-					if(isUpdateTime)
-						newDayBook.setTransactionAmount(difference+previousCashInHand);
-					else
-						newDayBook.setTransactionAmount(dayBook.getTransactionAmount()+previousCashInHand);
+				newDayBook.setTransactionAmount(difference+previousCashInHand);
 			}else{
 				LOGGER.info("--- transaction type debit true ---");
 				if(previousCashInHand<dayBook.getTransactionAmount()){
-					if(isUpdateTime)
-						newDayBook.setTransactionAmount(previousCashInHand-difference);
-					else
-						newDayBook.setTransactionAmount(previousCashInHand-dayBook.getTransactionAmount());
+					newDayBook.setTransactionAmount(previousCashInHand-difference);
 				}else{
-					if(isUpdateTime)
-						newDayBook.setTransactionAmount(previousCashInHand-difference);
-					else
-						newDayBook.setTransactionAmount(previousCashInHand-dayBook.getTransactionAmount());
+					newDayBook.setTransactionAmount(previousCashInHand-difference);
 				}
 					
 			}
@@ -686,15 +718,9 @@ public class DayBookRestController extends AbstractRestHandler{
 				LOGGER.info("--- today cash in hand amount is not empty ---");
 				
 				if(dayBook.getTransactionType()==TransactionType.CREDIT){
-					if(isUpdateTime)
-						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+difference);
-					else
-						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+dayBook.getTransactionAmount());
+					cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+difference);
 				}else{
-					if(isUpdateTime)
-						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()-difference);
-					else
-						cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()-dayBook.getTransactionAmount());
+					cashInHand.setTransactionAmount(cashInHand.getTransactionAmount()+difference);
 				}
 				
 				cashInHand.setTransactionDesc("cash in hand system  update update on "+new Date());
@@ -719,91 +745,56 @@ public class DayBookRestController extends AbstractRestHandler{
 		LOGGER.info("--- nextTransactions -> {} ---",nextTransactions);
 		for(DayBook transaction:nextTransactions){
 			Double balance=0.0;
-			if(transaction.getTransactionAmount()<=0){
+		/*	if(transaction.getTransactionAmount()<=0){
 				if(difference<=0){
 					if(dayBook.getTransactionType()==TransactionType.DEBIT){
 						if(transaction.getTransactionAmount()<difference){
-							if(isUpdateTime)
-								balance=difference-transaction.getTransactionAmount();
-							else
-								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+							balance=difference-transaction.getTransactionAmount();
 						}else{
-							if(isUpdateTime)
-								balance=transaction.getTransactionAmount()-difference;
-							else
-								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+							balance=transaction.getTransactionAmount()-difference;
 						}
 					}else{
-						if(isUpdateTime)
-							balance=transaction.getTransactionAmount()+difference;
-						else
-							balance=transaction.getTransactionAmount()+dayBook.getTransactionAmount();
+						balance=transaction.getTransactionAmount()+difference;
 					}
 				}else{
 					if(dayBook.getTransactionType()==TransactionType.DEBIT){
 					if(transaction.getTransactionAmount()<difference){
-							if(isUpdateTime)
-								balance=difference-transaction.getTransactionAmount();
-							else
-								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+							balance=difference-transaction.getTransactionAmount();		
 					}else{
-							if(isUpdateTime){
-								balance=transaction.getTransactionAmount()-difference;
-							}else{
-								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
-							}
-						}
+						balance=transaction.getTransactionAmount()-difference;
+					}
 					}else{
-						if(isUpdateTime)
-							balance=difference+transaction.getTransactionAmount();
-						else
-							balance=dayBook.getTransactionAmount()+transaction.getTransactionAmount();
+						balance=difference+transaction.getTransactionAmount();
 					}
 				}
 			}else{
 				if(difference<=0){
 					if(dayBook.getTransactionType()==TransactionType.DEBIT){
 						if(transaction.getTransactionAmount()<difference){
-							if(isUpdateTime){
-								balance=difference-transaction.getTransactionAmount();
-							}else{
-								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
-							}
+							balance=difference-transaction.getTransactionAmount();
 						}else{
-							if(isUpdateTime){
-								balance=transaction.getTransactionAmount()-difference;
-							}else{
-								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
-							}
+							balance=transaction.getTransactionAmount()-difference;
 						}
 					}else{
-						if(isUpdateTime)
-							balance=transaction.getTransactionAmount()+difference;
-						else
-							balance=transaction.getTransactionAmount()+dayBook.getTransactionAmount();
+						balance=transaction.getTransactionAmount()+difference;
 					}
 				}else{
 					if(dayBook.getTransactionType()==TransactionType.DEBIT){
 						if(transaction.getTransactionAmount()<difference){
-							if(isUpdateTime)
-								balance=difference-transaction.getTransactionAmount();
-							else
-								balance=dayBook.getTransactionAmount()-transaction.getTransactionAmount();
+							balance=difference-transaction.getTransactionAmount();
 						}else{
-							if(isUpdateTime)
-								balance=transaction.getTransactionAmount()-difference;
-							else
-								balance=transaction.getTransactionAmount()-dayBook.getTransactionAmount();
+							balance=transaction.getTransactionAmount()-difference;
 						}
 					
 					}else{
-						if(isUpdateTime)
 							balance=difference+transaction.getTransactionAmount();
-						else
-							balance=dayBook.getTransactionAmount()+transaction.getTransactionAmount();
 					}
 				}
-			}
+			}*/
+			
+			
+			balance=difference+transaction.getTransactionAmount();
+			
 			
 			transaction.setTransactionAmount(balance);
 								
