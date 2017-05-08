@@ -46,10 +46,12 @@
 					<tbody ng-repeat='cash in cashBookSearchList'>
 							
 						<tr ng-repeat="eachEntry in cash.transactions">
-							<td ng-bind='eachEntry.transactionDate'></td>
+							<td ng-bind="eachEntry.transactionDate | date: 'dd-MM-yyyy' "></td>
 							<td ng-bind='eachEntry.accountNumber'></td>
 							<td ng-bind='eachEntry.accountName'></td>
-							<td ng-bind='eachEntry.transactionDesc'></td>
+							<td>
+								<span ng-if='eachEntry.accountId != 1' ng-bind='eachEntry.transactionDesc'></span>
+							</td>
 							<td
 								ng-bind="eachEntry.transactionType == 'CREDIT' ? eachEntry.transactionAmount :''"></td>
 							<td
