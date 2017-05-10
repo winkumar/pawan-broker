@@ -310,3 +310,7 @@ table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th,
     border : 1px solid #333;
     border-radius : 5px;
 }
+
+table >tbody >tr{
+	background-color:#eee;
+}

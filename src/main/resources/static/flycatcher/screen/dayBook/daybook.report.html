@@ -24,7 +24,6 @@
 			</tr>
 		</thead>
 		<tbody ng-repeat='cash in cashBookSearchList'>
-
 			<tr ng-repeat="eachEntry in cash.transactions">
 				<td ng-bind="eachEntry.transactionDate | date: 'dd-MM-yyyy' "></td>
 				<td ng-bind='eachEntry.accountNumber'></td>
