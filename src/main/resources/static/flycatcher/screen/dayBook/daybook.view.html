@@ -41,25 +41,34 @@
 							<th>Description</th>
 							<th>Credit</th>
 							<th>Debit</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody ng-repeat='cash in cashBookSearchList'>
 							
 						<tr ng-repeat="eachEntry in cash.transactions">
-							<td ng-bind='eachEntry.transactionDate'></td>
+							<td ng-bind="eachEntry.transactionDate | date: 'dd-MM-yyyy' "></td>
 							<td ng-bind='eachEntry.accountNumber'></td>
 							<td ng-bind='eachEntry.accountName'></td>
-							<td ng-bind='eachEntry.transactionDesc'></td>
+							<td>
+								<span ng-if='eachEntry.accountId != 1' ng-bind='eachEntry.transactionDesc'></span>
+							</td>
 							<td
 								ng-bind="eachEntry.transactionType == 'CREDIT' ? eachEntry.transactionAmount :''"></td>
 							<td
 								ng-bind="eachEntry.transactionType == 'DEBIT' ? eachEntry.transactionAmount : ''"></td>
+							<td style="width:10px;">
+								<a class="btn btn-default"><em class="fa fa-pencil"></em></a> 
+								<a class="btn btn-danger"><em class="fa fa-trash"></em></a>
+							</td>
 						</tr>
 						<tr ng-if='cash.balance > 0' style='font-weight: bold;'>
 							<td colspan='4' style='font-size: 14px;' class='label_right'>
 							Balance : <span ng-bind='cash.balance'></span>
 							</td>
-							<td colspan='2'></td>
+							<td><span ng-if="cash.credit" ng-bind="cash.credit"></span></td>
+							<td><span ng-if="cash.debit" ng-bind="cash.debit"></span></td>
+							<td></td>
 						</tr>
 					</tbody>
 				</table>
