@@ -10,29 +10,25 @@
 				<label class="col-sm-1 label_right">From</label>
 				<div class="col-sm-3">
 					<input type="date" class="form-control" name="startDate"
-						id="startDate" ng-model="daybookSearch.startDate" required
-						ng-class="{errors: isValidate(myform,myform.startDate)}" />
+						id="startDate" ng-model="daybookSearch.startDate" required/>
 				</div>
 				<label class="col-sm-1 label_right">To</label>
 				<div class="col-sm-3">
 					<input type="date" class="form-control" name="endDate" id="endDate"
-						ng-model="daybookSearch.endDate" required
-						ng-class="{errors: isValidate(myform,myform.endDate)}" />
+						ng-model="daybookSearch.endDate" required/>
 				</div>
 			</div>
 			<div class="form-group">
 				<span class="col-sm-3"></span>
 				<button type="button" class="btn btn-primary"
 					ng-click="clearsearch()">Cancel</button>
-				<button type="button" class="btn btn-primary"
-					ng-disabled='myform.$invalid' ng-click="search(daybookSearch)">Search</button>
+				<button type="button" class="btn btn-primary" ng-click="search(daybookSearch)">Search</button>
 				<button type="button" class="btn btn-primary"
 					ng-click="exportData()">Download</button>
-				<button type="button" class="btn btn-primary" ng-click="hide(false)">Back</button>
+				<button type="button" class="btn btn-primary" ng-click="init()">Back</button>
 			</div>
 			<div>
-				<table class="table table-bordered"
-					style="font-size: 13px;">
+				<table class="table table-bordered" style="font-size: 13px;">
 					<thead>
 						<tr>
 							<th>Date</th>
@@ -45,26 +41,25 @@
 						</tr>
 					</thead>
 					<tbody ng-repeat='cash in cashBookSearchList'>
-							
+
 						<tr ng-repeat="eachEntry in cash.transactions">
 							<td ng-bind="eachEntry.transactionDate | date: 'dd-MM-yyyy' "></td>
 							<td ng-bind='eachEntry.accountNumber'></td>
 							<td ng-bind='eachEntry.accountName'></td>
-							<td>
-								<span ng-if='eachEntry.accountId != 1' ng-bind='eachEntry.transactionDesc'></span>
-							</td>
+							<td><span ng-if='eachEntry.accountId != 1'
+								ng-bind='eachEntry.transactionDesc'></span></td>
 							<td
 								ng-bind="eachEntry.transactionType == 'CREDIT' ? eachEntry.transactionAmount :''"></td>
 							<td
 								ng-bind="eachEntry.transactionType == 'DEBIT' ? eachEntry.transactionAmount : ''"></td>
-							<td style="width:10px;">
-								<a class="btn btn-default"><em class="fa fa-pencil"></em></a> 
-								<a class="btn btn-danger"><em class="fa fa-trash"></em></a>
-							</td>
+							<td style="width: 10px;"><a class="btn btn-default"
+								data-toggle="modal" data-target="#myModal" ng-click="editBook(eachEntry,eachEntry.accountTypeId)"> <em
+									class="fa fa-pencil"></em>
+							</a> <a class="btn btn-danger" ng-click="deleteDayBookFromPopUp(eachEntry,daybookSearch)"><em class="fa fa-trash"></em></a></td>
 						</tr>
 						<tr ng-if='cash.balance > 0' style='font-weight: bold;'>
 							<td colspan='4' style='font-size: 14px;' class='label_right'>
-							Balance : <span ng-bind='cash.balance'></span>
+								Balance : <span ng-bind='cash.balance'></span>
 							</td>
 							<td><span ng-if="cash.credit" ng-bind="cash.credit"></span></td>
 							<td><span ng-if="cash.debit" ng-bind="cash.debit"></span></td>
@@ -77,5 +72,75 @@
 	</div>
 	<div id='daybookContent' ng-hide='true'>
 		<div ng-include="'/flycatcher/screen/dayBook/daybook.report.html'"></div>
+	</div>
+</div>
+<div class="modal fade" id="myModal" role='dialog' style='padding-top:50px;'>
+	<div class="modal-dialog">
+		<div class="col-sm-10">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Day Book</h3>
+				</div>
+				<div class="panel-body">
+					<form class="form-horizontal fv-form fv-form-bootstrap">
+						<div class="form-group">
+							<label class="col-sm-4 label_right">Date</label>
+							<div class="col-sm-8">
+								<input type="date" class="form-control" name="date" id="date"
+									ng-model="daybook.transactionDate" required/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 label_right">Account Type</label>
+							<div class="col-sm-8">
+								<select class="form-control" name="accountType" id="accountType"
+									ng-model="daybook.accountType" required
+									ng-options="account.id as account.accountType for account in accountTypeList"
+									ng-change="loadAccounts(daybook.accountType);">
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 label_right">Account</label>
+							<div class="col-sm-8">
+								<select class="form-control" name="accountName" id="accountName"
+									ng-model="daybook.accountId"
+									required ng-disabled='daybook.accountType ==null'
+									ng-options="acc.accountId as concatName(acc.firstName,acc.accountNumber) for acc in accountList">
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 label_right">Amount</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="amount"
+									ng-model="daybook.transactionAmount" id="amount" required/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-4 label_right">Type</label>
+							<div class="col-sm-8">
+								<label class="col-sm-4 label_right"> <input type="radio"
+									name="type" ng-model="daybook.transactionType" id="creditType"
+									required value="CREDIT"/>Credit
+								</label> <label class="col-sm-4 label_right"> <input
+									type="radio" name="type" ng-model="daybook.transactionType"
+									id="debitType" required value="DEBIT"/>Debit
+								</label>
+							</div>
+						</div>
+						<div class="form-group ">
+							<span class="col-sm-6"></span>
+							<button type="button" class="btn btn-primary"
+								ng-click="clear(myform)">Clear</button>
+							<button type="button" class="btn btn-primary"
+								ng-click="saveOrUpdateDaybookFromPopUp(myform,daybook)">Save</button>
+							<button type="button" class="btn btn-danger"
+								data-dismiss="modal">Close</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

@@ -37,7 +37,7 @@
 								</div>
 
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">Father's Name</label>
 								<div class="col-sm-8">
 									<input 
@@ -50,7 +50,7 @@
 									ng-class="{errors: isValidate(myform,myform.fathername)}"/>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">Present Address</label>
 								<div class="col-sm-8">
 								<textarea 
@@ -64,7 +64,7 @@
 									ng-class="{errors: isValidate(myform,myform.presentAddress)}"></textarea>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">Current  Address</label>
 								<div class="col-sm-8">
 								<textarea 
@@ -78,7 +78,7 @@
 									ng-class="{errors: isValidate(myform,myform.currentAddress)}"></textarea>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">Area</label>
 								<div class="col-sm-8">
 									<input 
@@ -91,7 +91,7 @@
 									ng-class="{errors: isValidate(myform,myform.area)}"/>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">City</label>
 								<div class="col-sm-8">
 									<input 
@@ -102,7 +102,7 @@
 									name="city"/>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">State</label>
 								<div class="col-sm-8">
 									<input 
@@ -115,7 +115,7 @@
 									ng-class="{errors: isValidate(myform,myform.state)}"/>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" ng-if='account.accountTypeId == 5'>
 								<label class="col-sm-4 label_right">Pincode</label>
 								<div class="col-sm-8">
 									<input 
@@ -128,7 +128,7 @@
 									ng-class="{errors: isValidate(myform,myform.pinCode)}"/>
 								</div>
 							</div>
-							<div class="form-group ">
+							<div class="form-group " >
 								<span class="col-sm-8"></span>
 								<button 
 								type="button" 

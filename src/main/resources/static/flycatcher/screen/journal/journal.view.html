@@ -26,15 +26,15 @@
 						</div>
 						<div class="form-group ">
 							<span class="col-sm-3"></span>
-							<button type="button" class="btn btn-primary" ng-click="clearsearch()">Cancel</button>
+							<button type="button" class="btn btn-primary"
+								ng-click="clearsearch()">Cancel</button>
 							<button type="button" class="btn btn-primary"
 								ng-disabled='myform.$invalid' ng-click="search(journalSearch)">Search</button>
 							<button type="button" class="btn btn-primary"
 								ng-click="exportData(journalSearch)">Download</button>
 						</div>
 						<div>
-							<table class="table table-bordered"
-								style="font-size: 13px;">
+							<table class="table table-striped table-bordered" style="font-size: 13px;">
 								<thead>
 									<tr>
 										<th>Date</th>
@@ -45,24 +45,28 @@
 										<th>Debit</th>
 									</tr>
 								</thead>
-								<tbody>
-									<tr ng-repeat="personalAcc in journalList.personal.transactions">
-										<td ng-bind="personalAcc.transactionDate | date :'dd-MM-yyyy'"></td>
-										<td ng-bind="personalAcc.accountNumber"></td>
-										<td ng-bind="personalAcc.accountName"></td>
-										<td ng-bind="personalAcc.transactionDesc"></td>
-										<td class='label_right'
-											ng-bind="personalAcc.transactionType == 'CREDIT' ? personalAcc.transactionAmount :''"></td>
-										<td class='label_right'
-											ng-bind="personalAcc.transactionType == 'DEBIT' ? personalAcc.transactionAmount : ''"></td>
+								<tbody ng-repeat='individualJournal in journalList'>
+									<tr>
+										<td colspan="6" class='text-uppercase'><span>{{individualJournal[0].accountName}}
+												Account</span></td>
 									</tr>
-									<tr ng-if="journalList.personal.transactions.length > 0 " style='font-weight:bold;'>
-										<td colspan ="2" class='label_right'>Balance : 
-										 <span ng-bind="journalList.personal.balance"></span>
-										</td>
-										<td colspan ="2" class='label_right'>Total</td>
-										<td class='label_right' ng-bind='journalList.personal.credit'></td>
-										<td class='label_right' ng-bind='journalList.personal.debit'></td>
+									<tr ng-repeat='journal in individualJournal'>
+										<td ng-bind="journal.transactionDate | date :'dd-MM-yyyy'"></td>
+										<td ng-bind="journal.accountNumber"></td>
+										<td ng-bind="journal.accountName"></td>
+										<td ng-bind="journal.transactionDesc"></td>
+										<td
+											ng-bind="journal.transactionType == 'CREDIT' ? journal.transactionAmount :''"></td>
+										<td
+											ng-bind="journal.transactionType == 'DEBIT' ? journal.transactionAmount : ''"></td>
+									</tr>
+									<tr style='font-weight: bold;'>
+										<td></td>
+										<td></td>
+										<td style="text-align: right;">Balance : <span ng-bind="individualJournal[0].commonInfo.balance"></span></td>
+										<td style="text-align: right;">Total</td>
+										<td style="text-align: right;" ng-bind="individualJournal[0].commonInfo.creditTotal"></td>
+										<td style="text-align: right;"ng-bind="individualJournal[0].commonInfo.debitTotal"></td>
 									</tr>
 								</tbody>
 							</table>

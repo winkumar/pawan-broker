@@ -297,20 +297,20 @@ public class AccountRestController extends AbstractRestHandler {
 			throw new DataFormatException("account type doesn't exist's ...!");
 		}
 		
-		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
-			LOGGER.info("--- father name is empty or null ---");
-			throw new DataFormatException("father name doesn't exist's ...!");
-		}
-		
-		if(accountInfo.getPinCode()==null || accountInfo.getPinCode().isEmpty()){
-			LOGGER.info("--- pincode is empty or null ---");
-			throw new DataFormatException("pincode doesn't exist's ...!");
-		}
-		
-		if(accountInfo.getState()==null || accountInfo.getState().isEmpty()){
-			LOGGER.info("---  state is empty or null ---");
-			throw new DataFormatException("state doesn't exist's ...!");
-		}
+//		if(accountInfo.getFatherName()==null || accountInfo.getFatherName().isEmpty()){
+//			LOGGER.info("--- father name is empty or null ---");
+//			throw new DataFormatException("father name doesn't exist's ...!");
+//		}
+//		
+//		if(accountInfo.getPinCode()==null || accountInfo.getPinCode().isEmpty()){
+//			LOGGER.info("--- pincode is empty or null ---");
+//			throw new DataFormatException("pincode doesn't exist's ...!");
+//		}
+//		
+//		if(accountInfo.getState()==null || accountInfo.getState().isEmpty()){
+//			LOGGER.info("---  state is empty or null ---");
+//			throw new DataFormatException("state doesn't exist's ...!");
+//		}
 		
 		String userName=this.userInfoService.getUserNameForAthentication();
 		UserInfo createdBy=this.userInfoService.getUserInfoUserName(userName);

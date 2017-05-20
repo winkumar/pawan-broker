@@ -42,5 +42,6 @@ public class DayBookInfo implements Serializable{
 	private Long accountTypeId;
 	private String accountNumber;
 	private String accountName;
+	private CommonInfo commonInfo;
 
 }

@@ -88,6 +88,35 @@
 		   }
 	   }
 	   
+	   $scope.saveOrUpdateDaybookFromPopUp= function(myform,daybook){
+		   $http({
+	    	    method: 'PUT',
+	    	    url: '/api/v1/dayBooks/'+daybook.dayBookId,
+	    	    data  : daybook,
+	    	    headers: {'Content-Type': 'application/json'}
+	    	}).success(function(data, status, headers, config){
+	    		 $('#myModal').modal("toggle");
+	    		 $scope.dayBookView = true;
+	    	}).error(function(data, status, headers, config){
+	    		$scope.errormessage = data.message;
+	    	});
+		  
+	   };
+	   
+	   $scope.deleteDayBookFromPopUp = function(daybook,val){
+		   $http({
+	    	    method: 'DELETE',
+	    	    url: '/api/v1/dayBooks/'+daybook.dayBookId,
+	    	    data  : daybook,
+	    	    headers: {'Content-Type': 'application/json'}
+	    	}).success(function(data, status, headers, config){
+	    		$scope.dayBookView = true;
+	    		$scope.search(val);
+	    	}).error(function(data, status, headers, config){
+	    		$scope.errormessage = data.message;
+	    	});
+	   }
+	   
 	   $scope.concatName = function(v1,v2){
 		   if(v1 !== null && v2 !== null){
 			   return (v1 +"-"+v2);
@@ -150,7 +179,8 @@
 		   $scope.dayBookView = val;
 		   $scope.search(null);
 	   }; 
-
+	   
+	
 	   $scope.cashbookList = function(url){
 		   $http({
 	    	    method: 'GET',
