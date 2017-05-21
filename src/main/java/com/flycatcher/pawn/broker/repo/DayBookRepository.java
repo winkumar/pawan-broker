@@ -22,7 +22,7 @@ import com.flycatcher.pawn.broker.model.DayBook;
  */
 public interface DayBookRepository extends JpaRepository<DayBook, Long> {
 
-	@Query("SELECT d FROM DayBook d WHERE " +
+	@Query("SELECT d FROM DayBook d WHERE d.account.accountId !=1 AND " +
             "( LOWER(d.transactionAmount) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(d.transactionType) LIKE LOWER(CONCAT('%',?1, '%')) OR "
             +" LOWER(d.transactionDate) LIKE LOWER(CONCAT('%',?1, '%')) OR "

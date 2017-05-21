@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.flycatcher.pawn.broker.UrlPath;
 import com.flycatcher.pawn.broker.exception.DataFormatException;
+import com.flycatcher.pawn.broker.exception.OtherException;
 import com.flycatcher.pawn.broker.exception.ResourceNotFoundException;
 import com.flycatcher.pawn.broker.model.Account;
 import com.flycatcher.pawn.broker.model.AccountType;
@@ -431,7 +432,7 @@ public class DayBookRestController extends AbstractRestHandler{
 		
 		//call and update cash in hand
 		try {
-			checkAndUpdateCashInHand(createdDayBook,createdDayBook,createdBy,false);
+			checkAndUpdateCashInHand(createdDayBook,createdDayBook,createdBy,false,false);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
@@ -546,7 +547,7 @@ public class DayBookRestController extends AbstractRestHandler{
 		
 		//call and update cash in hand
 		try {
-			checkAndUpdateCashInHand(dupDayBook,createdDayBook,createdBy,true);
+			checkAndUpdateCashInHand(dupDayBook,createdDayBook,createdBy,true,false);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}		
@@ -579,6 +580,19 @@ public class DayBookRestController extends AbstractRestHandler{
 			throw new ResourceNotFoundException("daybook doesn't exist's ...!");
 		}
 		
+		if(new Long(1).equals(dayBook.getAccount().getAccountId())){
+			LOGGER.error("---- account not valid to remove ---");
+			throw new OtherException("you can't remove cash in hand account transactions ...!");
+		}
+		
+		
+		//call and update cash in hand
+		try {
+			checkAndUpdateCashInHand(dayBook,dayBook,dayBook.getCreatedBy(),false,true);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+				
 		this.dayBookService.removeDayBookById(dayBookId);
 		LOGGER.info("--- daybook removed successfully ---");
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -596,7 +610,7 @@ public class DayBookRestController extends AbstractRestHandler{
 	 * @param isUpdateTime , find out update or create
 	 * @throws ParseException
 	 */
-	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy,Boolean isUpdateTime) throws ParseException{
+	private void checkAndUpdateCashInHand(DayBook oldDayBook,DayBook dayBook,UserInfo createdBy,Boolean isUpdateTime,Boolean isDelete) throws ParseException{
 		LOGGER.info("---- Inside cash in hand checking and create or update ----");
 		
 		Sort sort=new Sort(Sort.DEFAULT_DIRECTION,"transactionDate");
@@ -656,11 +670,23 @@ public class DayBookRestController extends AbstractRestHandler{
 				}
 				
 			//}
-		}else{
-			if(dayBook.getTransactionType()==TransactionType.DEBIT)
-				difference=-dayBook.getTransactionAmount();
-			else
+		}else if(isDelete){
+			LOGGER.info("--- Delete Operation ---");
+			if(dayBook.getTransactionType()==TransactionType.DEBIT){
+				LOGGER.info("========= DEBIT DELETE ========");
 				difference=dayBook.getTransactionAmount();
+			}else{
+				LOGGER.info("========= CREDIT DELETE ========");
+				difference=-dayBook.getTransactionAmount();
+			}
+		}else{
+			if(dayBook.getTransactionType()==TransactionType.DEBIT){
+				LOGGER.info("========= DEBIT ========");
+				difference=-dayBook.getTransactionAmount();
+			}else{
+				LOGGER.info("========= CREDIT ========");
+				difference=dayBook.getTransactionAmount();
+			}
 		}
 
 		LOGGER.info("--- difference amount -> {} ---",difference);
@@ -700,9 +726,9 @@ public class DayBookRestController extends AbstractRestHandler{
 			}else{
 				LOGGER.info("--- transaction type debit true ---");
 				if(previousCashInHand<dayBook.getTransactionAmount()){
-					newDayBook.setTransactionAmount(previousCashInHand-difference);
+					newDayBook.setTransactionAmount(previousCashInHand+difference);
 				}else{
-					newDayBook.setTransactionAmount(previousCashInHand-difference);
+					newDayBook.setTransactionAmount(previousCashInHand+difference);
 				}
 					
 			}

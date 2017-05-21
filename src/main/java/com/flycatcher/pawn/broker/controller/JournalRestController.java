@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,14 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.flycatcher.pawn.broker.UrlPath;
 import com.flycatcher.pawn.broker.exception.DataFormatException;
-import com.flycatcher.pawn.broker.model.Account;
-import com.flycatcher.pawn.broker.model.AccountType;
 import com.flycatcher.pawn.broker.model.DayBook;
 import com.flycatcher.pawn.broker.model.TransactionType;
 import com.flycatcher.pawn.broker.pojo.CommonInfo;
 import com.flycatcher.pawn.broker.pojo.DayBookInfo;
-import com.flycatcher.pawn.broker.service.AccountService;
-import com.flycatcher.pawn.broker.service.AccountTypeService;
 import com.flycatcher.pawn.broker.service.DayBookService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -59,16 +53,12 @@ public class JournalRestController extends AbstractRestHandler{
 	private static final Logger LOGGER = LoggerFactory.getLogger(JournalRestController.class);
 	
 	private final DayBookService dayBookService;
-	private final AccountService accountService;
-	private final AccountTypeService accountTypeService;
 	
 	@Autowired
-	public JournalRestController(final DayBookService dayBookService,final AccountService accountService,final AccountTypeService accountTypeService){
+	public JournalRestController(final DayBookService dayBookService){
 		LOGGER.info("--- JournalRestController Invoked ---");
 		
 		this.dayBookService=dayBookService;
-		this.accountService=accountService;
-		this.accountTypeService=accountTypeService;
 								
 	}
 	

@@ -1,7 +1,6 @@
 package com.flycatcher.pawn.broker.pojo;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -17,9 +16,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class CommonInfo implements Serializable {
-
+	private static final long serialVersionUID = 1L;
+	
 	private Double balance;
 	private Double creditTotal;
 	private Double debitTotal;
