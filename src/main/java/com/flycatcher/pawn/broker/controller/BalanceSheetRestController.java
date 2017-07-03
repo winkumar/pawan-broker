@@ -129,6 +129,7 @@ public class BalanceSheetRestController extends AbstractRestHandler{
 		List<BalanceSheetInfo> balanceSheetInfos=new ArrayList<BalanceSheetInfo>();
 		
 		
+		
 		if(accountTypeId==-1 || accountTypeId==null){
 			Sort sort=new Sort(sortDirection,"priority");
 			List<AccountType> accountTypes=this.accountTypeService.getAllAccountType(sort);
